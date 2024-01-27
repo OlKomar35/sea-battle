@@ -1,4 +1,7 @@
-package org.komar.technical_project.game;
+package org.komar.technical_project.gamer1;
+
+import org.komar.technical_project.game.GameField;
+import org.komar.technical_project.game.SetOfShips;
 
 public class Player {
   protected String name;

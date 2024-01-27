@@ -30,7 +30,7 @@ public class SetOfShips {
     }
   }
 
-  public int getTotalCount() {
+  public int getTotalShipsCount() {
     return totalCount;
   }
 
@@ -43,5 +43,9 @@ public class SetOfShips {
     System.out.println(Ship.TWO.getViewShip() + " - " + completeSetOfShips.get(Ship.TWO) + " штук");
     System.out.println(
         Ship.ONE.getViewShip() + " - " + completeSetOfShips.get(Ship.ONE) + " штук" + TextColor.ANSI_RESET.getColorText());
+  }
+
+  public Map<Ship, Integer> getCompleteSetOfShips() {
+    return completeSetOfShips;
   }
 }
