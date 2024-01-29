@@ -1,12 +1,14 @@
-package org.komar.technical_project.gamer1;
+package org.komar.technical_project.gamers;
 
-import org.komar.technical_project.game.GameField;
-import org.komar.technical_project.game.SetOfShips;
+
+import org.komar.technical_project.gamespace.GameField;
+import org.komar.technical_project.gamespace.SetOfShips;
 
 public class Player {
   protected String name;
   protected GameField gameField;
   protected SetOfShips setOfShips;
+  protected int totalCountShip;
   protected boolean winner;
 
   public Player(String name) {
@@ -14,6 +16,7 @@ public class Player {
     this.gameField = new GameField();
     this.setOfShips = new SetOfShips();
     this.winner = false;
+    this.totalCountShip = setOfShips.getTotalShipsCount();
   }
 
   public String getName() {
@@ -28,12 +31,16 @@ public class Player {
     return setOfShips;
   }
 
-  public boolean isWinner() {
-    return winner;
+  public void setTotalCountShip(int totalCountShip) {
+    this.totalCountShip = totalCountShip;
   }
 
-  public void setName(String name) {
-    this.name = name;
+  public int getTotalCountShip() {
+    return totalCountShip;
+  }
+
+  public boolean isWinner() {
+    return winner;
   }
 
   public void setWinner(boolean winner) {

@@ -1,4 +1,4 @@
-package org.komar.technical_project.game;
+package org.komar.technical_project.gamespace;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -35,7 +35,6 @@ public class SetOfShips {
   }
 
   public void viewCountShips() {
-    System.out.println(TextColor.ANSI_RED.getColorText() + "Количество всех(оставшихся) кораблей, которые нужно расставить");
     System.out.println(Ship.SIX.getViewShip() + " - " + completeSetOfShips.get(Ship.SIX) + " штук");
     System.out.println(Ship.FIVE.getViewShip() + " - " + completeSetOfShips.get(Ship.FIVE) + " штук");
     System.out.println(Ship.FOUR.getViewShip() + " - " + completeSetOfShips.get(Ship.FOUR) + " штук");

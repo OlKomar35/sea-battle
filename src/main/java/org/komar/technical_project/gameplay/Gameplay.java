@@ -1,10 +1,8 @@
 package org.komar.technical_project.gameplay;
 
-import java.util.Arrays;
 import java.util.Scanner;
-import org.komar.technical_project.bot.Bot;
-import org.komar.technical_project.game.Ship;
-import org.komar.technical_project.gamer1.Player;
+import org.komar.technical_project.gamespace.Ship;
+import org.komar.technical_project.gamers.Player;
 import org.komar.technical_project.helper.ConsoleHelper;
 import org.komar.technical_project.helper.GameElements;
 import org.komar.technical_project.helper.TextColor;
@@ -13,44 +11,23 @@ public class Gameplay {
 
   private final Player player1;
   private Player player2;
+  private Scanner scanner;
 
-  private final String ELEMENT_SHIP = Ship.ONE_ELEMENT.getViewShip();
-  private final String MISSED = GameElements.MISSED.getNameElement();
-  private final String KILLED = GameElements.KILLED.getNameElement();
+  private final String ELEMENT_SHIP = GameElements.ONE_ELEMENT.getNameElement();
+  private final String MISSED = TextColor.ANSI_YELLOW.getColorText()
+      + GameElements.MISSED.getNameElement() + TextColor.ANSI_BLUE.getColorText();
+  private final String KILLED = TextColor.ANSI_YELLOW.getColorText()
+      + GameElements.KILLED.getNameElement() + TextColor.ANSI_BLUE.getColorText();
   private final String BUSY = GameElements.BUSY.getNameElement();
   private boolean winner;
 
-  public Gameplay() {
-
-    Scanner scanner = new Scanner(System.in, "UTF-8");
-
+  public Gameplay(Player player1,
+                  Player player2,
+                  Scanner scanner) {
+    this.player1 = player1;
+    this.player2 = player2;
+    this.scanner = scanner;
     this.winner = false;
-    System.out.println("\n Введите ваше имя: ");
-    String nameGamer1 = scanner.nextLine();
-    this.player1 = new Player(nameGamer1);
-    ConsoleHelper.getMsgWelcome(nameGamer1);
-
-    ConsoleHelper.getMsgChoosingOpponent();
-
-    this.player2 = null;
-    boolean isSelectedOpponent = false;
-
-    while (!isSelectedOpponent) {
-      String nameGamer2 = scanner.nextLine();
-      if (nameGamer2.startsWith("gamer2")) {
-        String[] partMsg = nameGamer2.split(" -");
-        String msg = partMsg[1];
-
-        if (msg.equals("bot")) {
-          this.player2 = new Bot();
-        } else if (msg.equals("p")) {
-          this.player2 = new Player("");
-        }
-        isSelectedOpponent = true;
-      } else {
-        ConsoleHelper.getMsgInvalidCommandEntered();
-      }
-    }
 
     System.out.println("-------------------------------------------------------------------------");
     System.out.printf("%s и  %s, можем приступать к игре\n", player1.getName(), player2.getName());
@@ -89,13 +66,14 @@ public class Gameplay {
         player1.getGameField().randomFillGameField(player1.getSetOfShips().getCompleteSetOfShips());
         showGeneralGameField();
       }
+      ConsoleHelper.clearConsole();
     } else {
       ConsoleHelper.getMsgInvalidCommandEntered();
     }
 
-    ConsoleHelper.clearConsole();
-
     Player step = player1;
+    Player opponent = player2;
+    int countElements = 0;
     while (!winner) {
       ConsoleHelper.getMsgCoordinates(step.getName());
       String coordinates = scanner.nextLine();
@@ -105,21 +83,66 @@ public class Gameplay {
       char columnChar = partMsg[1].charAt(0);
       int column = step.getGameField().getColumnsNameList().indexOf(columnChar);
 
-      boolean flag = step.getGameField().isStepPlayer();
-      while (flag) {
-        step.getGameField().playerWalks(row, column);
-        flag = step.getGameField().isStepPlayer();
-
+      GameElements gameElements = opponent.getGameField().checkingForHits(row, column);
+      if (gameElements.equals(GameElements.MISSED)) {
+        Player temp = step;
+        step = opponent;
+        opponent = temp;
+      } else if (gameElements.equals(GameElements.HURT)) {
+        countElements++;
+      } else if (gameElements.equals(GameElements.KILLED)) {
+        countElements++;
+        opponent.getSetOfShips().removeShips(Ship.getViewShipByLength(countElements));
+        opponent.setTotalCountShip(opponent.getTotalCountShip() - 1);
+        System.out.printf("Осталось у противника %d кораблей\n", opponent.getTotalCountShip());
+        countElements = 0;
+        if (opponent.getTotalCountShip() == 0) {
+          step.setWinner(true);
+          winner = true;
+          ConsoleHelper.getWinnerMsg(step.getName());
+        }
+        fillGameFieldOpponent(opponent);
       }
-      if (step.getName().equals(player1.getName())) {
-        step = player2;
-      } else {
-        step = player1;
+      ConsoleHelper.clearConsole();
+      if (!winner) {
+        showGeneralGameField();
       }
-      showGeneralGameField();
     }
-    scanner.close();
   }
+
+  private void fillGameFieldOpponent(Player player) {
+    int rows = player.getGameField().getGameFieldMatrix().length;
+    int cols = player.getGameField().getGameFieldMatrix()[0].length;
+
+    for (int i = 0; i < rows; i++) {
+      for (int j = 0; j < cols; j++) {
+        if (player.getGameField().getGameFieldMatrix()[i][j] != null &&
+            player.getGameField().getGameFieldMatrix()[i][j].equals(KILLED)) {
+          checkSurroundingElements(player.getGameField().getGameFieldMatrix(), i, j);
+        }
+      }
+    }
+  }
+
+  public void checkSurroundingElements(Object[][] matrix,
+                                       int row,
+                                       int col) {
+    int rows = matrix.length;
+    int cols = matrix[0].length;
+
+    for (int i = row - 1; i <= row + 1; i++) {
+      for (int j = col - 1; j <= col + 1; j++) {
+        if ((i >= 0 && i < rows) && (j >= 0 && j < cols)) {
+          if (matrix[i][j].equals(BUSY)) {
+            matrix[i][j] = MISSED;
+          } else if (matrix[i][j] == null) {
+            matrix[i][j] = MISSED;
+          }
+        }
+      }
+    }
+  }
+
 
   public void showGeneralGameField() {
     System.out.print("    ");
@@ -162,7 +185,11 @@ public class Gameplay {
       }
       System.out.println();
     }
+    System.out.println();
+    System.out.println("    Ваши корабли, которые остались         ");
     player1.getSetOfShips().viewCountShips();
+
+    System.out.println("Корабли противника, которые остались");
     player2.getSetOfShips().viewCountShips();
     System.out.println(TextColor.ANSI_RESET.getColorText());
   }

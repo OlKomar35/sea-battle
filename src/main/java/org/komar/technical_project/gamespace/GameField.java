@@ -1,4 +1,4 @@
-package org.komar.technical_project.game;
+package org.komar.technical_project.gamespace;
 
 import java.util.Arrays;
 import java.util.List;
@@ -14,10 +14,15 @@ public class GameField {
    * Данный класс необходим для отрисовки и заполнения игрового поля
    */
 
-  private final String ELEMENT_SHIP = Ship.ONE_ELEMENT.getViewShip();
-  private final String MISSED = GameElements.MISSED.getNameElement();
-  private final String KILLED = GameElements.KILLED.getNameElement();
+  private final String ELEMENT_SHIP = GameElements.ONE_ELEMENT.getNameElement();
+  private final String MISSED = TextColor.ANSI_YELLOW.getColorText()
+      + GameElements.MISSED.getNameElement() + TextColor.ANSI_BLUE.getColorText();
+  private final String KILLED = TextColor.ANSI_YELLOW.getColorText()
+      + GameElements.KILLED.getNameElement() + TextColor.ANSI_BLUE.getColorText();
+  private final String HURT = TextColor.ANSI_YELLOW.getColorText()
+      + GameElements.HURT.getNameElement() + TextColor.ANSI_BLUE.getColorText();
   private final String BUSY = GameElements.BUSY.getNameElement();
+  private final String WATER = GameElements.WATER.getNameElement();
   private final int ROW_COUNT = 16;
   private final int COLUMN_COUNT = 16;
 
@@ -25,11 +30,14 @@ public class GameField {
   private final List<Character> columnsNameList
       = Arrays.asList('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p');
 
-  private String[][] gameFieldMatrix;
+  private Object[][] gameFieldMatrix;
+
   private boolean stepPlayer;
+
 
   public GameField() {
     this.gameFieldMatrix = new String[ROW_COUNT][COLUMN_COUNT];
+
     this.stepPlayer = true;
   }
 
@@ -42,7 +50,7 @@ public class GameField {
                                       char columnCoordinateChar,
                                       String orientation) {
     boolean isFreeCells = true;
-    int columnCoordinate = columnsNameList.indexOf(columnCoordinateChar);
+    int columnCoordinate = getColumnCoordinate(columnCoordinateChar);
     if (orientation.equals("v")) {
 
       if ((rowCoordinate - 1) > 0 && (rowCoordinate - 1 + lengthShip - 1) < ROW_COUNT) {
@@ -75,7 +83,7 @@ public class GameField {
                             int rowCoordinate,
                             char columnCoordinateChar,
                             String orientation) {
-    int columnCoordinate = columnsNameList.indexOf(columnCoordinateChar);
+    int columnCoordinate = getColumnCoordinate(columnCoordinateChar);
     if (orientation.equals("v")) {
       for (int count = 0; count < lengthShip; count++) {
         gameFieldMatrix[rowCoordinate - 1 + count][columnCoordinate] = ELEMENT_SHIP;
@@ -147,13 +155,13 @@ public class GameField {
       for (int count = 1; count <= ship.getValue(); count++) {
         boolean isView = false;
         while (!isView) {
-          int randomRowIndex = random.nextInt(rowsNameList.length); // Генерация случайного индекса строки
-          int randomColumnIndex = random.nextInt(columnsNameList.size()); // Генерация случайного индекса столбца
+          int randomRowIndex = random.nextInt(rowsNameList.length);
+          int randomColumnIndex = random.nextInt(columnsNameList.size());
           int row = rowsNameList[randomRowIndex];
           char column = columnsNameList.get(randomColumnIndex);
-          int randomValue = random.nextInt(2); // Генерация случайного числа 0 или 1
+          int randomValue = random.nextInt(2);
           String orientation =
-              randomValue == 0 ? "v" : "h"; // Возвращение "v" если случайное число равно 0, иначе возвращение "h"
+              randomValue == 0 ? "v" : "h";
 
           if (isBusyGameFieldCells(ship.getKey().getLengthShip(), row, column, orientation)) {
             fillGameField(ship.getKey().getLengthShip(), row, column, orientation);
@@ -162,23 +170,39 @@ public class GameField {
         }
       }
     }
-//    viewGameBoard();
   }
 
-  public void playerWalks(int row,
-                          int column) {
-    if (gameFieldMatrix[row][column] == null && gameFieldMatrix[row][column].equals(BUSY)) {
+  public GameElements checkingForHits(int row,
+                                      int column) {
+    if (gameFieldMatrix[row - 1][column] == null) {
       ConsoleHelper.getMsgMissed();
-      gameFieldMatrix[row][column] = MISSED;
-      stepPlayer = false;
-    } else if(gameFieldMatrix[row][column].equals(ELEMENT_SHIP)){
-      ConsoleHelper.getMsgKilled();
-      gameFieldMatrix[row][column] = KILLED;
-      stepPlayer = true;
-    } else if (gameFieldMatrix[row][column].equals(MISSED) ||gameFieldMatrix[row][column].equals(KILLED)) {
+      gameFieldMatrix[row - 1][column] = MISSED;
+      return GameElements.MISSED;
+    } else if (gameFieldMatrix[row - 1][column].equals(BUSY)) {
+      ConsoleHelper.getMsgMissed();
+      gameFieldMatrix[row - 1][column] = MISSED;
+      return GameElements.MISSED;
+    } else if (gameFieldMatrix[row - 1][column].equals(ELEMENT_SHIP)) {
+      if (checkSurroundingElements(row - 1, column)) {
+        ConsoleHelper.getMsgHurt();
+        gameFieldMatrix[row - 1][column] = HURT;
+        return GameElements.HURT;
+
+      } else {
+        ConsoleHelper.getMsgKilled();
+        gameFieldMatrix[row - 1][column] = KILLED;
+        return GameElements.KILLED;
+      }
+    } else if (gameFieldMatrix[row - 1][column].equals(MISSED) || gameFieldMatrix[row - 1][column].equals(KILLED)) {
       ConsoleHelper.getMsgLoser();
       stepPlayer = false;
+      return GameElements.MISSED;
     }
+    return null;
+  }
+
+  public int getColumnCoordinate(char value) {
+    return columnsNameList.indexOf(value);
   }
 
   public int[] getRowsNameList() {
@@ -189,8 +213,25 @@ public class GameField {
     return columnsNameList;
   }
 
-  public String[][] getGameFieldMatrix() {
+  public Object[][] getGameFieldMatrix() {
     return gameFieldMatrix;
   }
 
+  public boolean checkSurroundingElements(int row,
+                                          int col) {
+    int rows = gameFieldMatrix.length;
+    int cols = gameFieldMatrix[0].length;
+    boolean isChecked = false; // KILLED
+
+    for (int i = row - 1; i <= row + 1; i++) {
+      for (int j = col - 1; j <= col + 1; j++) {
+        if (i >= 0 && i < rows && j >= 0 && j < cols && (i != row || j != col)) {
+          if (gameFieldMatrix[i][j].equals(ELEMENT_SHIP)) {
+            isChecked = true; //HURT
+          }
+        }
+      }
+    }
+    return isChecked;
+  }
 }

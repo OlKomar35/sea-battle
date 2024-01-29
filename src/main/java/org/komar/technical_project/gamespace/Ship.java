@@ -1,4 +1,4 @@
-package org.komar.technical_project.game;
+package org.komar.technical_project.gamespace;
 
 public enum Ship {
   SIX("@ @ @ @ @ @", 6),
@@ -6,8 +6,7 @@ public enum Ship {
   FOUR("@ @ @ @",4),
   THREE("@ @ @", 3),
   TWO("@ @",2),
-  ONE("@",1),
-  ONE_ELEMENT("@",0);
+  ONE("@",1);
 
   private final String viewShip;
   private final int lengthShip;

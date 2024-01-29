@@ -1,9 +1,12 @@
 package org.komar.technical_project.helper;
 
 public enum GameElements {
-  MISSED("\u002E"),
+  MISSED("."),
   KILLED("X"),
-  BUSY("+");
+  HURT("X"),
+  BUSY("+"),
+  WATER("~"),
+  ONE_ELEMENT("@");
 
   private final String nameElement;
   GameElements(String nameElement) {

@@ -1,6 +1,4 @@
-package org.komar.technical_project.bot;
-
-import org.komar.technical_project.gamer1.Player;
+package org.komar.technical_project.gamers;
 
 public class Bot extends Player {
 

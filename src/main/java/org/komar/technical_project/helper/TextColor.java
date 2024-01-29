@@ -5,6 +5,8 @@ public enum TextColor {
   ANSI_GREEN("\u001B[32m"),
   ANSI_RED("\u001B[31m"),
   ANSI_PURPLE("\u001B[35m"),
+  ANSI_WHITE("\u001B[37m"),
+  ANSI_YELLOW("\u001B[33m"),
   ANSI_BLUE("\u001B[34m");
 
 
