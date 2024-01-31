@@ -1,6 +1,10 @@
 package org.komar.technical_project.gameplay;
 
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Scanner;
+import org.komar.technical_project.gamespace.Coordinates;
 import org.komar.technical_project.gamespace.Ship;
 import org.komar.technical_project.gamers.Player;
 import org.komar.technical_project.helper.ConsoleHelper;
@@ -75,15 +79,17 @@ public class Gameplay {
     Player opponent = player2;
     int countElements = 0;
     while (!winner) {
-      ConsoleHelper.getMsgCoordinates(step.getName());
-      String coordinates = scanner.nextLine();
-      String[] partMsg = coordinates.split("-");
+    /*  try {*/
+        //Thread.sleep(2500);
+        ConsoleHelper.getMsgCoordinates(step.getName());
+     /* } catch (InterruptedException ex) {
+        Thread.currentThread().interrupt();
+      }*/
 
-      int row = Integer.parseInt(partMsg[0]);
-      char columnChar = partMsg[1].charAt(0);
-      int column = step.getGameField().getColumnsNameList().indexOf(columnChar);
+      Coordinates coordinates = step.getCoordinates(scanner);
+      GameElements gameElements = opponent.checkingForHits(coordinates.getRow(), coordinates.getColumn());
+      step.setStatus(gameElements);
 
-      GameElements gameElements = opponent.getGameField().checkingForHits(row, column);
       if (gameElements.equals(GameElements.MISSED)) {
         Player temp = step;
         step = opponent;
@@ -185,12 +191,24 @@ public class Gameplay {
       }
       System.out.println();
     }
-    System.out.println();
-    System.out.println("    Ваши корабли, которые остались         ");
-    player1.getSetOfShips().viewCountShips();
 
+    System.out.println();
+
+    System.out.print("  Ваши корабли, которые остались         ");
     System.out.println("Корабли противника, которые остались");
-    player2.getSetOfShips().viewCountShips();
+    Iterator<Map.Entry<Ship, Integer>> iterator1 = player1.getSetOfShips().getCompleteSetOfShips().entrySet()
+        .iterator();
+    Iterator<Map.Entry<Ship, Integer>> iterator2 = player2.getSetOfShips().getCompleteSetOfShips().entrySet()
+        .iterator();
+    String emptyPane = "                   ";
+    while (iterator1.hasNext() && iterator2.hasNext()) {
+      Map.Entry<Ship, Integer> entry1 = iterator1.next();
+      Map.Entry<Ship, Integer> entry2 = iterator2.next();
+      System.out.print(entry1.getKey().getViewShip() + " - " + entry1.getValue() + " штук");
+      emptyPane += "  ";
+      System.out.print(emptyPane);
+      System.out.println(entry2.getKey().getViewShip() + " - " + entry2.getValue() + " штук");
+    }
     System.out.println(TextColor.ANSI_RESET.getColorText());
   }
 }

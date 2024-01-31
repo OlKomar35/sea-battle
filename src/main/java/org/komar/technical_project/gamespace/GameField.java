@@ -4,7 +4,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import org.komar.technical_project.helper.ConsoleHelper;
 import org.komar.technical_project.helper.GameElements;
 import org.komar.technical_project.helper.TextColor;
 
@@ -32,17 +31,8 @@ public class GameField {
 
   private Object[][] gameFieldMatrix;
 
-  private boolean stepPlayer;
-
-
   public GameField() {
     this.gameFieldMatrix = new String[ROW_COUNT][COLUMN_COUNT];
-
-    this.stepPlayer = true;
-  }
-
-  public boolean isStepPlayer() {
-    return stepPlayer;
   }
 
   public boolean isBusyGameFieldCells(int lengthShip,
@@ -51,7 +41,7 @@ public class GameField {
                                       String orientation) {
     boolean isFreeCells = true;
     int columnCoordinate = getColumnCoordinate(columnCoordinateChar);
-    if (orientation.equals("v")) {
+    if (orientation.equals(Orientation.VERTICAL.getOrientation())) {
 
       if ((rowCoordinate - 1) > 0 && (rowCoordinate - 1 + lengthShip - 1) < ROW_COUNT) {
         for (int r = rowCoordinate - 1; r <= rowCoordinate - 1 + lengthShip - 1; r++) {
@@ -64,7 +54,7 @@ public class GameField {
         isFreeCells = false;
       }
     }
-    if (orientation.equals("h")) {
+    if (orientation.equals(Orientation.HORIZONTAL.getOrientation())) {
       if (columnCoordinate > 0 && (columnCoordinate + lengthShip - 1 < COLUMN_COUNT)) {
         for (int c = columnCoordinate; c <= columnCoordinate + lengthShip - 1; c++) {
           if (gameFieldMatrix[rowCoordinate - 1][c] != null) {
@@ -84,7 +74,7 @@ public class GameField {
                             char columnCoordinateChar,
                             String orientation) {
     int columnCoordinate = getColumnCoordinate(columnCoordinateChar);
-    if (orientation.equals("v")) {
+    if (orientation.equals(Orientation.VERTICAL.getOrientation())) {
       for (int count = 0; count < lengthShip; count++) {
         gameFieldMatrix[rowCoordinate - 1 + count][columnCoordinate] = ELEMENT_SHIP;
       }
@@ -101,7 +91,7 @@ public class GameField {
           }
         }
       }
-    } else if (orientation.equals("h")) {
+    } else if (orientation.equals(Orientation.HORIZONTAL.getOrientation())) {
       for (int count = 0; count < lengthShip; count++) {
         gameFieldMatrix[rowCoordinate - 1][columnCoordinate + count] = ELEMENT_SHIP;
       }
@@ -160,45 +150,16 @@ public class GameField {
           int row = rowsNameList[randomRowIndex];
           char column = columnsNameList.get(randomColumnIndex);
           int randomValue = random.nextInt(2);
-          String orientation =
-              randomValue == 0 ? "v" : "h";
+          Orientation orientation =
+              randomValue == 0 ? Orientation.VERTICAL : Orientation.HORIZONTAL;
 
-          if (isBusyGameFieldCells(ship.getKey().getLengthShip(), row, column, orientation)) {
-            fillGameField(ship.getKey().getLengthShip(), row, column, orientation);
+          if (isBusyGameFieldCells(ship.getKey().getLengthShip(), row, column, orientation.getOrientation())) {
+            fillGameField(ship.getKey().getLengthShip(), row, column, orientation.getOrientation());
             isView = true;
           }
         }
       }
     }
-  }
-
-  public GameElements checkingForHits(int row,
-                                      int column) {
-    if (gameFieldMatrix[row - 1][column] == null) {
-      ConsoleHelper.getMsgMissed();
-      gameFieldMatrix[row - 1][column] = MISSED;
-      return GameElements.MISSED;
-    } else if (gameFieldMatrix[row - 1][column].equals(BUSY)) {
-      ConsoleHelper.getMsgMissed();
-      gameFieldMatrix[row - 1][column] = MISSED;
-      return GameElements.MISSED;
-    } else if (gameFieldMatrix[row - 1][column].equals(ELEMENT_SHIP)) {
-      if (checkSurroundingElements(row - 1, column)) {
-        ConsoleHelper.getMsgHurt();
-        gameFieldMatrix[row - 1][column] = HURT;
-        return GameElements.HURT;
-
-      } else {
-        ConsoleHelper.getMsgKilled();
-        gameFieldMatrix[row - 1][column] = KILLED;
-        return GameElements.KILLED;
-      }
-    } else if (gameFieldMatrix[row - 1][column].equals(MISSED) || gameFieldMatrix[row - 1][column].equals(KILLED)) {
-      ConsoleHelper.getMsgLoser();
-      stepPlayer = false;
-      return GameElements.MISSED;
-    }
-    return null;
   }
 
   public int getColumnCoordinate(char value) {
@@ -217,21 +178,12 @@ public class GameField {
     return gameFieldMatrix;
   }
 
-  public boolean checkSurroundingElements(int row,
-                                          int col) {
-    int rows = gameFieldMatrix.length;
-    int cols = gameFieldMatrix[0].length;
-    boolean isChecked = false; // KILLED
 
-    for (int i = row - 1; i <= row + 1; i++) {
-      for (int j = col - 1; j <= col + 1; j++) {
-        if (i >= 0 && i < rows && j >= 0 && j < cols && (i != row || j != col)) {
-          if (gameFieldMatrix[i][j].equals(ELEMENT_SHIP)) {
-            isChecked = true; //HURT
-          }
-        }
-      }
-    }
-    return isChecked;
+  public int getROW_COUNT() {
+    return ROW_COUNT;
+  }
+
+  public int getCOLUMN_COUNT() {
+    return COLUMN_COUNT;
   }
 }

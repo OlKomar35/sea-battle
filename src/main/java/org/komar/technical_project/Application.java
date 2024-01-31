@@ -21,10 +21,7 @@ public class Application {
 
     Scanner scanner = new Scanner(System.in, "UTF-8");
 
-    System.out.println("\n Введите ваше имя: ");
-    String nameGamer1 = scanner.nextLine();
-    Player player1 = new Human(nameGamer1);
-    ConsoleHelper.getMsgWelcome(nameGamer1);
+    Player player1 = getPlayer(scanner);
 
     ConsoleHelper.getMsgChoosingOpponent();
 
@@ -41,7 +38,7 @@ public class Application {
         if (msg.equals("bot")) {
           player2 = new Bot();
         } else if (msg.equals("p")) {
-          player2 = new Player("");
+          player2 = getPlayer(scanner);
         }
         isSelectedOpponent = true;
       } else {
@@ -52,6 +49,13 @@ public class Application {
     new Gameplay(player1, player2 , scanner);
 
     scanner.close();
+  }
 
+  public static Player getPlayer(Scanner scanner){
+    System.out.println("\n Введите ваше имя: ");
+    String nameGamer1 = scanner.nextLine();
+    Player player1 = new Human(nameGamer1);
+    ConsoleHelper.getMsgWelcome(nameGamer1);
+    return player1;
   }
 }
