@@ -10,11 +10,4 @@ import lombok.NoArgsConstructor;
 public class Coordinates {
   int row;
   int column;
-  Orientation orientation = Orientation.NONE;
-
-  public Coordinates(int row,
-                     int column) {
-    this.row = row;
-    this.column = column;
-  }
 }

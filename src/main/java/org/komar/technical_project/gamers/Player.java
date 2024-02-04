@@ -5,6 +5,7 @@ import java.util.Scanner;
 import org.komar.technical_project.gamespace.Coordinates;
 import org.komar.technical_project.gamespace.GameField;
 import org.komar.technical_project.gamespace.SetOfShips;
+import org.komar.technical_project.gamespace.ShipCoordinates;
 import org.komar.technical_project.helper.ConsoleHelper;
 import org.komar.technical_project.helper.GameElements;
 import org.komar.technical_project.helper.TextColor;
@@ -28,7 +29,8 @@ public class Player {
   protected GameElements status;
   protected boolean winner;
   protected boolean stepPlayer;
-
+  protected int countHurtElements;
+  protected ShipCoordinates ship;
 
   public Player(String name) {
     this.name = name;
@@ -39,6 +41,8 @@ public class Player {
     this.winner = false;
 
     this.stepPlayer = true;
+    this.countHurtElements = 0;
+
   }
 
   public String getName() {
@@ -77,6 +81,13 @@ public class Player {
     this.winner = winner;
   }
 
+  public int getCountHurtElements() {
+    return countHurtElements;
+  }
+  public void setCountHurtElements(int countHurtElements) {
+    this.countHurtElements = countHurtElements;
+  }
+
   public Coordinates getCoordinates(Scanner scanner) {
     String coordinates = scanner.nextLine();
     String[] partMsg = coordinates.split("-");
@@ -100,14 +111,19 @@ public class Player {
       getGameField().getGameFieldMatrix()[row - 1][column] = MISSED;
       return GameElements.MISSED;
     } else if (getGameField().getGameFieldMatrix()[row - 1][column].equals(ELEMENT_SHIP)) {
-      if (checkSurroundingElements(row - 1, column)) {
-        ConsoleHelper.getMsgHurt();
-        getGameField().getGameFieldMatrix()[row - 1][column] = HURT;
-        return GameElements.HURT;
+      countHurtElements++;
 
+      if (countHurtElements == 1) {
+        ship = new ShipCoordinates(row - 1, column, getGameField().getGameFieldMatrix());
+      }
+      getGameField().getGameFieldMatrix()[row - 1][column] = HURT;
+      ship.getShipCoordinates().put(new Coordinates(row - 1, column), GameElements.HURT);
+
+      if (ship.checkSurroundingElements(row - 1, column)) {
+        ConsoleHelper.getMsgHurt();
+        return GameElements.HURT;
       } else {
         ConsoleHelper.getMsgKilled();
-        getGameField().getGameFieldMatrix()[row - 1][column] = KILLED;
         return GameElements.KILLED;
       }
     } else if (getGameField().getGameFieldMatrix()[row - 1][column].equals(MISSED)
@@ -117,23 +133,5 @@ public class Player {
       return GameElements.MISSED;
     }
     return null;
-  }
-
-  public boolean checkSurroundingElements(int row,
-                                          int col) {
-    int rows = getGameField().getGameFieldMatrix().length;
-    int cols = getGameField().getGameFieldMatrix()[0].length;
-    boolean isChecked = false; // KILLED
-
-    for (int i = row - 1; i <= row + 1; i++) {
-      for (int j = col - 1; j <= col + 1; j++) {
-        if (i >= 0 && i < rows && j >= 0 && j < cols && (i != row || j != col)) {
-          if (getGameField().getGameFieldMatrix()[i][j].equals(ELEMENT_SHIP)) {
-            isChecked = true; //HURT
-          }
-        }
-      }
-    }
-    return isChecked;
   }
 }

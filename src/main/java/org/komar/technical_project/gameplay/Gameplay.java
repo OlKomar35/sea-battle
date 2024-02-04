@@ -95,13 +95,14 @@ public class Gameplay {
         step = opponent;
         opponent = temp;
       } else if (gameElements.equals(GameElements.HURT)) {
-        countElements++;
+
       } else if (gameElements.equals(GameElements.KILLED)) {
-        countElements++;
-        opponent.getSetOfShips().removeShips(Ship.getViewShipByLength(countElements));
+        System.out.println(opponent.getCountHurtElements());
+        System.out.println(step.getCountHurtElements());
+        opponent.getSetOfShips().removeShips(Ship.getViewShipByLength(opponent.getCountHurtElements()));
         opponent.setTotalCountShip(opponent.getTotalCountShip() - 1);
+        opponent.setCountHurtElements(0);
         System.out.printf("Осталось у противника %d кораблей\n", opponent.getTotalCountShip());
-        countElements = 0;
         if (opponent.getTotalCountShip() == 0) {
           step.setWinner(true);
           winner = true;
@@ -183,7 +184,7 @@ public class Gameplay {
       for (int column = 0; column < player2.getGameField().getGameFieldMatrix()[0].length; column++) {
         if (player2.getGameField().getGameFieldMatrix()[row][column] != null
             && !player2.getGameField().getGameFieldMatrix()[row][column].equals(BUSY)
-            && !player2.getGameField().getGameFieldMatrix()[row][column].equals(ELEMENT_SHIP)) {
+           /* && !player2.getGameField().getGameFieldMatrix()[row][column].equals(ELEMENT_SHIP)*/) {
           System.out.print(player2.getGameField().getGameFieldMatrix()[row][column] + " ");
         } else {
           System.out.print("~ ");
