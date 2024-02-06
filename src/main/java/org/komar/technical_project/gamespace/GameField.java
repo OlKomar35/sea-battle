@@ -1,5 +1,7 @@
 package org.komar.technical_project.gamespace;
 
+import java.io.BufferedWriter;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -21,7 +23,6 @@ public class GameField {
   private final String HURT = TextColor.ANSI_YELLOW.getColorText()
       + GameElements.HURT.getNameElement() + TextColor.ANSI_BLUE.getColorText();
   private final String BUSY = GameElements.BUSY.getNameElement();
-  private final String WATER = GameElements.WATER.getNameElement();
   private final int ROW_COUNT = 16;
   private final int COLUMN_COUNT = 16;
 
@@ -110,32 +111,42 @@ public class GameField {
     }
   }
 
-  public void viewGameBoard() {
-    System.out.print("    ");
-    for (char c : columnsNameList) {
-      System.out.print(TextColor.ANSI_BLUE.getColorText() + c + " ");
+  public void getResetColorMatrix() {
+    for (int row = 0; row < rowsNameList.length; row++) {
+      for (int col = 0; col < columnsNameList.size(); col++) {
+        if (gameFieldMatrix[row][col].toString().contains(GameElements.MISSED.getNameElement())) {
+          gameFieldMatrix[row][col] = GameElements.MISSED.getNameElement();
+        } else if (gameFieldMatrix[row][col].toString().contains(GameElements.HURT.getNameElement())) {
+          gameFieldMatrix[row][col] = GameElements.HURT.getNameElement();
+        } else if (gameFieldMatrix[row][col].toString().contains(GameElements.KILLED.getNameElement())) {
+          gameFieldMatrix[row][col] = GameElements.KILLED.getNameElement();
+        }
+      }
     }
-    System.out.print("     ");
+  }
+
+  public void writeToFileGameBoard(BufferedWriter writer) throws IOException {
+    writer.newLine();
+    writer.write("    ");
     for (char c : columnsNameList) {
-      System.out.print(TextColor.ANSI_BLUE.getColorText() + c + " ");
+      writer.write(c + " ");
     }
-    System.out.println();
+    writer.newLine();
     for (int row = 0; row < rowsNameList.length; row++) {
       if (row < 9) {
-        System.out.print(" " + rowsNameList[row] + "  ");
+        writer.write("_" + rowsNameList[row] + "  ");
       } else {
-        System.out.print(" " + rowsNameList[row] + " ");
+        writer.write("_" + rowsNameList[row] + " ");
       }
       for (int column = 0; column < gameFieldMatrix[0].length; column++) {
         if (gameFieldMatrix[row][column] != null && !gameFieldMatrix[row][column].equals(BUSY)) {
-          System.out.print(gameFieldMatrix[row][column] + " ");
+          writer.write(gameFieldMatrix[row][column] + " ");
         } else {
-          System.out.print("~ ");
+          writer.write("~ ");
         }
       }
-      System.out.println();
+      writer.newLine();
     }
-    System.out.println(TextColor.ANSI_RESET.getColorText());
   }
 
   public void randomFillGameField(Map<Ship, Integer> completeSetOfShips) {

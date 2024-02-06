@@ -17,7 +17,8 @@ public class Bot extends Player {
   int countHurt;
 
   public Bot() {
-    super("Bot Валера");
+    super();
+    this.name = "Бот Валера";
     gameField.randomFillGameField(setOfShips.getCompleteSetOfShips());
 
     this.randomCount = 0;

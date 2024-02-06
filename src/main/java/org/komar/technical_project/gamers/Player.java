@@ -31,9 +31,13 @@ public class Player {
   protected boolean stepPlayer;
   protected int countHurtElements;
   protected ShipCoordinates ship;
+  protected int countSteps;
+  protected int countFineSteps;
 
-  public Player(String name) {
-    this.name = name;
+  public Player() {
+
+    this.name = "Без имени игрок";
+
     this.gameField = new GameField();
     this.setOfShips = new SetOfShips();
     this.status = GameElements.MISSED;
@@ -43,6 +47,8 @@ public class Player {
     this.stepPlayer = true;
     this.countHurtElements = 0;
 
+    this.countSteps = 0;
+    this.countFineSteps = 0;
   }
 
   public String getName() {
@@ -84,10 +90,31 @@ public class Player {
   public int getCountHurtElements() {
     return countHurtElements;
   }
+
   public void setCountHurtElements(int countHurtElements) {
     this.countHurtElements = countHurtElements;
   }
 
+  public int getCountSteps() {
+    return countSteps;
+  }
+
+  public void setCountSteps(int countSteps) {
+    this.countSteps = countSteps;
+  }
+
+  public int getCountFineSteps() {
+    return countFineSteps;
+  }
+
+  public void setCountFineSteps(int countFineSteps) {
+    this.countFineSteps = countFineSteps;
+  }
+
+  /**
+   * @param scanner
+   * @return
+   */
   public Coordinates getCoordinates(Scanner scanner) {
     String coordinates = scanner.nextLine();
     String[] partMsg = coordinates.split("-");
@@ -98,6 +125,12 @@ public class Player {
 
     return new Coordinates(row, column);
   }
+
+  /**
+   * @param row
+   * @param column
+   * @return
+   */
 
   public GameElements checkingForHits(int row,
                                       int column) {

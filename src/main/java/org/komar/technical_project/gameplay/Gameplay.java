@@ -1,13 +1,26 @@
 package org.komar.technical_project.gameplay;
 
+import static org.komar.technical_project.helper.FileHelper.*;
+
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Scanner;
+import org.komar.technical_project.gamers.Bot;
 import org.komar.technical_project.gamespace.Coordinates;
 import org.komar.technical_project.gamespace.Ship;
 import org.komar.technical_project.gamers.Player;
 import org.komar.technical_project.helper.ConsoleHelper;
+import org.komar.technical_project.helper.DateTimeHelper;
+import org.komar.technical_project.helper.FileHelper;
 import org.komar.technical_project.helper.GameElements;
 import org.komar.technical_project.helper.TextColor;
 
@@ -33,87 +46,149 @@ public class Gameplay {
     this.scanner = scanner;
     this.winner = false;
 
-    System.out.println("-------------------------------------------------------------------------");
-    System.out.printf("%s и  %s, можем приступать к игре\n", player1.getName(), player2.getName());
-    System.out.println("-------------------------------------------------------------------------");
-    System.out.println("Заполните ваши игровые поля кораблями\n");
+    LocalDateTime dateTime = LocalDateTime.now();
+    String formattedDateForFile = dateTime.format(DateTimeHelper.getDateTimeFormatFused());
+    String gameFileName = "game_" + formattedDateForFile + ".txt";
 
-    ConsoleHelper.getMsgFillGameField();
+    Path path = Paths.get(FileHelper.getRootDirPath());
 
-    String coordinatesShipMsg = scanner.nextLine();
-
-    if (coordinatesShipMsg.startsWith("ship")) {
-      int totalCountShip = player1.getSetOfShips().getTotalShipsCount();
-      String[] partMsg = coordinatesShipMsg.split(" -");
-      String msg = partMsg[1];
-
-      if (msg.equals("p")) {
-        while (totalCountShip > 0) {
-          System.out.printf("Осталось ввести %d корабль(корабля)\n", totalCountShip);
-          System.out.println("Введите команду ship с необходимыми координатами");
-
-          int lengthShip = Integer.parseInt(partMsg[2]);
-          int rowCoordinate = Integer.parseInt(partMsg[3]);
-          char columnCoordinateChar = partMsg[4].charAt(0);
-          String orientation = partMsg[5];
-
-          if (player1.getGameField()
-              .isBusyGameFieldCells(lengthShip, rowCoordinate, columnCoordinateChar, orientation)) {
-            player1.getGameField().fillGameField(lengthShip, rowCoordinate, columnCoordinateChar, orientation);
-            showGeneralGameField();
-            player1.getSetOfShips().removeShips(Ship.getViewShipByLength(lengthShip));
-            player1.getSetOfShips().viewCountShips();
-            totalCountShip--;
-          }
-        }
-      } else if (msg.equals("r")) {
-        player1.getGameField().randomFillGameField(player1.getSetOfShips().getCompleteSetOfShips());
-        showGeneralGameField();
+    if (!Files.exists(path)) {
+      try {
+        Files.createDirectories(path);
+      } catch (IOException e) {
+        e.printStackTrace();
+        return;
       }
-      ConsoleHelper.clearConsole();
-    } else {
-      ConsoleHelper.getMsgInvalidCommandEntered();
     }
 
-    Player step = player1;
-    Player opponent = player2;
-    int countElements = 0;
-    while (!winner) {
-    /*  try {*/
-        //Thread.sleep(2500);
+    String filePath = FileHelper.getRootDirPath().concat(fileSeparator).concat(gameFileName);
+    File file = new File(filePath);
+
+    try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
+      writer.write("Игра была запущена " + LocalDateTime.now().format(DateTimeHelper.getDateTimeFormat()));
+      writer.newLine();
+
+      System.out.println(TextColor.ANSI_YELLOW.getColorText()
+                             + "Файл для администратора успешно создан (" + gameFileName + ")"
+                             + TextColor.ANSI_RESET.getColorText());
+
+      System.out.println("-------------------------------------------------------------------------");
+      System.out.printf("%s и  %s, можем приступать к игре\n", player1.getName(), player2.getName());
+      System.out.println("-------------------------------------------------------------------------");
+
+      writer.write("Игрок 1: " + player1.getName() + " и ");
+      writer.write("Игрок 2: " + player2.getName());
+      writer.newLine();
+
+      showGeneralGameField(player1, player2);
+
+      writer.write("Игровое поле первого игрока ");
+      player1.getGameField().writeToFileGameBoard(writer);
+      writer.newLine();
+      writer.write("Игровое поле второго игрока ");
+      player2.getGameField().writeToFileGameBoard(writer);
+      writer.newLine();
+
+      Player step = player1;
+      Player opponent = player2;
+      int countElements = 0;
+      while (!winner) {
+        step.setCountSteps(step.getCountSteps() + 1);
         ConsoleHelper.getMsgCoordinates(step.getName());
-     /* } catch (InterruptedException ex) {
-        Thread.currentThread().interrupt();
-      }*/
 
-      Coordinates coordinates = step.getCoordinates(scanner);
-      GameElements gameElements = opponent.checkingForHits(coordinates.getRow(), coordinates.getColumn());
-      step.setStatus(gameElements);
+        Coordinates coordinates = step.getCoordinates(scanner);
+        if (step instanceof Bot) {
+          System.out.println("Нажмите Enter");
+          scanner.nextLine();
 
-      if (gameElements.equals(GameElements.MISSED)) {
-        Player temp = step;
-        step = opponent;
-        opponent = temp;
-      } else if (gameElements.equals(GameElements.HURT)) {
-
-      } else if (gameElements.equals(GameElements.KILLED)) {
-        System.out.println(opponent.getCountHurtElements());
-        System.out.println(step.getCountHurtElements());
-        opponent.getSetOfShips().removeShips(Ship.getViewShipByLength(opponent.getCountHurtElements()));
-        opponent.setTotalCountShip(opponent.getTotalCountShip() - 1);
-        opponent.setCountHurtElements(0);
-        System.out.printf("Осталось у противника %d кораблей\n", opponent.getTotalCountShip());
-        if (opponent.getTotalCountShip() == 0) {
-          step.setWinner(true);
-          winner = true;
-          ConsoleHelper.getWinnerMsg(step.getName());
         }
-        fillGameFieldOpponent(opponent);
+        ConsoleHelper.clearConsole();
+
+//        try {
+//          Thread.sleep(1000);
+//        } catch (InterruptedException ex) {
+//          Thread.currentThread().interrupt();
+//        }
+
+        GameElements gameElements = opponent.checkingForHits(coordinates.getRow(), coordinates.getColumn());
+        step.setStatus(gameElements);
+
+        writer.write("Игрок " + step.getName() + " сделал ход ["
+                         + step.getGameField().getRowsNameList()[coordinates.getRow() - 1] + "-"
+                         + step.getGameField().getColumnsNameList().get(coordinates.getColumn())
+                         + "] в " + LocalTime.now().format(DateTimeHelper.getTimeFormat()));
+        writer.write("-" + step.getStatus().getStatus());
+        writer.newLine();
+
+        if (gameElements.equals(GameElements.MISSED)) {
+          Player temp = step;
+          step = opponent;
+          opponent = temp;
+        } else if (gameElements.equals(GameElements.HURT)) {
+          step.setCountFineSteps(step.getCountSteps() + 1);
+        } else if (gameElements.equals(GameElements.KILLED)) {
+          writer.write("Был убит корабль состоящий из " + opponent.getCountHurtElements() + " элемента(-ов)");
+          writer.newLine();
+
+          step.setCountFineSteps(step.getCountSteps() + 1);
+
+          opponent.getSetOfShips().removeShips(Ship.getViewShipByLength(opponent.getCountHurtElements()));
+          opponent.setTotalCountShip(opponent.getTotalCountShip() - 1);
+          opponent.setCountHurtElements(0);
+          System.out.printf("Осталось у противника %d кораблей\n", opponent.getTotalCountShip());
+          if (opponent.getTotalCountShip() == 0) {
+            step.setWinner(true);
+            winner = true;
+            ConsoleHelper.getWinnerMsg(step.getName());
+          }
+          fillGameFieldOpponent(opponent);
+        }
+        if (!winner) {
+          if (player2 instanceof Bot) {
+            showGeneralGameField(player1, player2);
+          } else {
+            showGeneralGameField(step, opponent);
+          }
+        }
       }
-      ConsoleHelper.clearConsole();
-      if (!winner) {
-        showGeneralGameField();
-      }
+      writer.write("Игра окончилась в " + LocalDateTime.now().format(DateTimeHelper.getDateTimeFormat()));
+      writer.newLine();
+
+      writer.write("Выиграл игрок: " + step.getName()
+                       + ", осталось неубитыми "
+                       + (step.getSetOfShips().getTotalShipsCount() - step.getTotalCountShip())
+                       + " собственных кораблей");
+      writer.newLine();
+      writer.write("Было сделано " + step.getCountSteps() + " ходов");
+      writer.newLine();
+      writer.write("Результативность = [(кол-во попаданий)/(кол-во ходов)*100] = "
+                       + (step.getCountFineSteps() * 100) / step.getCountSteps());
+      writer.newLine();
+      writer.write("Игровое поле первого игрока, на конец игры ");
+      //player1.getGameField().getResetColorMatrix();
+      player1.getGameField().writeToFileGameBoard(writer);
+      writer.newLine();
+      writer.write("----------------------------------------------------------------------------------------");
+      writer.newLine();
+      writer.write("Проиграл игрок: " + opponent.getName()
+                       + ", осталось неубитыми "
+                       + +(opponent.getSetOfShips().getTotalShipsCount() - opponent.getTotalCountShip())
+                       + " собственных кораблей");
+      writer.newLine();
+      writer.write("Было сделано " + opponent.getCountSteps() + " ходов");
+      writer.newLine();
+      writer.write("Результативность = [(кол-во попаданий)/(кол-во ходов)*100] = "
+                       + (opponent.getCountFineSteps() * 100) / opponent.getCountSteps());
+      writer.newLine();
+      writer.write("Игровое поле второго игрок, на конец игры ");
+      //player2.getGameField().getResetColorMatrix();
+      player2.getGameField().writeToFileGameBoard(writer);
+      writer.newLine();
+      writer.newLine();
+
+      writer.close();
+    } catch (IOException e) {
+      e.printStackTrace();
     }
   }
 
@@ -151,7 +226,8 @@ public class Gameplay {
   }
 
 
-  public void showGeneralGameField() {
+  public void showGeneralGameField(Player player1,
+                                   Player player2) {
     System.out.print("    ");
     for (char c : player1.getGameField().getColumnsNameList()) {
       System.out.print(TextColor.ANSI_BLUE.getColorText() + c + " ");
@@ -184,7 +260,7 @@ public class Gameplay {
       for (int column = 0; column < player2.getGameField().getGameFieldMatrix()[0].length; column++) {
         if (player2.getGameField().getGameFieldMatrix()[row][column] != null
             && !player2.getGameField().getGameFieldMatrix()[row][column].equals(BUSY)
-           /* && !player2.getGameField().getGameFieldMatrix()[row][column].equals(ELEMENT_SHIP)*/) {
+            && !player2.getGameField().getGameFieldMatrix()[row][column].equals(ELEMENT_SHIP)) {
           System.out.print(player2.getGameField().getGameFieldMatrix()[row][column] + " ");
         } else {
           System.out.print("~ ");
@@ -195,8 +271,8 @@ public class Gameplay {
 
     System.out.println();
 
-    System.out.print("  Ваши корабли, которые остались         ");
-    System.out.println("Корабли противника, которые остались");
+    System.out.print("  Ваши корабли, " + player1.getName() + " ");
+    System.out.println("Корабли противника," + player2.getName() + " ,которые остались");
     Iterator<Map.Entry<Ship, Integer>> iterator1 = player1.getSetOfShips().getCompleteSetOfShips().entrySet()
         .iterator();
     Iterator<Map.Entry<Ship, Integer>> iterator2 = player2.getSetOfShips().getCompleteSetOfShips().entrySet()

@@ -2,7 +2,6 @@ package org.komar.technical_project.gamespace;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
-import org.komar.technical_project.helper.TextColor;
 
 public class SetOfShips {
   protected Map<Ship, Integer> completeSetOfShips;

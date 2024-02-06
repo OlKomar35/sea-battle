@@ -2,6 +2,7 @@ package org.komar.technical_project;
 
 import java.util.Scanner;
 import org.komar.technical_project.gameplay.Gameplay;
+import org.komar.technical_project.gamers.Admin;
 import org.komar.technical_project.gamers.Bot;
 import org.komar.technical_project.gamers.Human;
 import org.komar.technical_project.gamers.Player;
@@ -18,43 +19,48 @@ public class Application {
     System.out.println("*              Морской бой             *");
     System.out.println("* * * * * * * * * * * * * * * * * * *  *" + TextColor.ANSI_RESET.getColorText());
 
+    System.out.println("Для авторизации с правами администратора введите команду"
+                           + TextColor.ANSI_GREEN.getColorText() + " --admin" + TextColor.ANSI_RESET.getColorText()
+                           +", если хотите начать игру нажмите "
+                           + TextColor.ANSI_GREEN.getColorText() + "Enter" + TextColor.ANSI_RESET.getColorText());
 
     Scanner scanner = new Scanner(System.in, "UTF-8");
 
-    Player player1 = getPlayer(scanner);
+    if (!scanner.nextLine().equals("--admin")) {
+      Player player1 = getPlayer(scanner);
+      ConsoleHelper.getMsgChoosingOpponent();
 
-    ConsoleHelper.getMsgChoosingOpponent();
+      Player player2 = null;
+      boolean isSelectedOpponent = false;
 
-    Player player2 = null;
-    boolean isSelectedOpponent = false;
+      while (!isSelectedOpponent) {
+        String nameGamer2 = scanner.nextLine();
+        if (nameGamer2.startsWith("gamer2")) {
 
-    while (!isSelectedOpponent) {
-      String nameGamer2 = scanner.nextLine();
-      if (nameGamer2.startsWith("gamer2")) {
+          String[] partMsg = nameGamer2.split(" -");
+          String msg = partMsg[1];
 
-        String[] partMsg = nameGamer2.split(" -");
-        String msg = partMsg[1];
-
-        if (msg.equals("bot")) {
-          player2 = new Bot();
-        } else if (msg.equals("p")) {
-          player2 = getPlayer(scanner);
+          if (msg.equals("bot")) {
+            player2 = new Bot();
+          } else if (msg.equals("p")) {
+            player2 = getPlayer(scanner);
+          }
+          isSelectedOpponent = true;
+        } else {
+          ConsoleHelper.getMsgInvalidCommandEntered();
         }
-        isSelectedOpponent = true;
-      } else {
-        ConsoleHelper.getMsgInvalidCommandEntered();
       }
+      new Gameplay(player1, player2, scanner);
+    }else{
+      new Admin(scanner);
     }
-
-    new Gameplay(player1, player2 , scanner);
-
     scanner.close();
   }
 
-  public static Player getPlayer(Scanner scanner){
-    System.out.println("\n Введите ваше имя: ");
+  public static Player getPlayer(Scanner scanner) {
+    System.out.println("\nВведите ваше имя: ");
     String nameGamer1 = scanner.nextLine();
-    Player player1 = new Human(nameGamer1);
+    Player player1 = new Human(nameGamer1, scanner);
     ConsoleHelper.getMsgWelcome(nameGamer1);
     return player1;
   }
