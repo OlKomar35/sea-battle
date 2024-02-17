@@ -6,7 +6,7 @@ import org.komar.technical_project.client.gameplay.Gameplay;
 import org.komar.technical_project.client.gamers.Admin;
 import org.komar.technical_project.client.gamers.Bot;
 import org.komar.technical_project.client.gamers.Human;
-import org.komar.technical_project.client.gamers.Network;
+import org.komar.technical_project.client.network.Network;
 import org.komar.technical_project.client.gamers.NetworkPlayer;
 import org.komar.technical_project.client.gamers.Player;
 import org.komar.technical_project.client.helper.ConsoleHelper;

@@ -26,7 +26,6 @@ public class Player {
   protected GameField gameField;
   protected SetOfShips setOfShips;
   protected int totalCountShip;
-
   protected GameElements status;
   protected boolean winner;
   protected boolean stepPlayer;
@@ -127,6 +126,7 @@ public class Player {
   //endregion
 
   /**
+   * Получение координат для выстрела (для данного типа игрока, данные берутся из консоли)
    * @param scanner переменная для чтения данных из консоли
    * @return Возвращает координаты для выстрела
    */
@@ -156,7 +156,7 @@ public class Player {
   }
 
   /**
-   *
+   * Проверяет какое произошло событие(ранил, убил или мимо)
    * @param row    координата строки
    * @param column координата столбца
    * @return Возвращает один из элементов из перечисления GameElements, проставляет в матрице с кораблями значение из
@@ -217,5 +217,7 @@ public class Player {
       }
     }
   }
+
+
 
 }

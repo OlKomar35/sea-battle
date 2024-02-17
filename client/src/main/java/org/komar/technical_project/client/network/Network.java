@@ -1,4 +1,4 @@
-package org.komar.technical_project.client.gamers;
+package org.komar.technical_project.client.network;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;

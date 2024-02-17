@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import org.komar.technical_project.client.helper.GameElements;
-import org.komar.technical_project.client.helper.TextColor;
 
 public class GameField {
 
@@ -59,7 +58,8 @@ public class GameField {
   //endregion
 
   /**
-   * Данный метод проверяет правильность расстановки корабля
+   * Данный метод проверяет правильность расстановки корабля, проверяет ли заняты ячейки с введенными координатами,
+   * куда пытаются поставить корабль
    *
    * @param lengthShip           длина корабля (кол-во элементов)
    * @param rowCoordinate        координата строки
@@ -76,7 +76,7 @@ public class GameField {
     int columnCoordinate = getColumnCoordinate(columnCoordinateChar);
     if (orientation.equals(Orientation.VERTICAL.getOrientation())) {
 
-      if ((rowCoordinate - 1) > 0 && (rowCoordinate - 1 + lengthShip - 1) < ROW_COUNT) {
+      if ((rowCoordinate - 1) >= 0 && (rowCoordinate - 1 + lengthShip - 1) < ROW_COUNT) {
         for (int r = rowCoordinate - 1; r <= rowCoordinate - 1 + lengthShip - 1; r++) {
           if (gameFieldMatrix[r][columnCoordinate] != null) {
             isFreeCells = false;
@@ -88,7 +88,7 @@ public class GameField {
       }
     }
     if (orientation.equals(Orientation.HORIZONTAL.getOrientation())) {
-      if (columnCoordinate > 0 && (columnCoordinate + lengthShip - 1 < COLUMN_COUNT)) {
+      if (columnCoordinate >=0  && (columnCoordinate + lengthShip - 1 < COLUMN_COUNT)) {
         for (int c = columnCoordinate; c <= columnCoordinate + lengthShip - 1; c++) {
           if (gameFieldMatrix[rowCoordinate - 1][c] != null) {
             isFreeCells = false;
