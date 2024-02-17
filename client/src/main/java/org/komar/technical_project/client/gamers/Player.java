@@ -142,21 +142,21 @@ public class Player {
         flag = false;
       }
       char columnChar = partMsg[1].charAt(0);
-      try {
-        column = getGameField().getColumnsNameList().indexOf(columnChar);
+      column = getGameField().getColumnsNameList().indexOf(columnChar);
+      if (column != -1) {
         flag = false;
-      } catch (Exception e) {
-        flag = true;
       }
-      if (!flag) {
+      if (flag) {
         System.out.println("Введены не верные координаты, введите заново");
       }
     }
 
     return new Coordinates(row, column);
+
   }
 
   /**
+   *
    * @param row    координата строки
    * @param column координата столбца
    * @return Возвращает один из элементов из перечисления GameElements, проставляет в матрице с кораблями значение из
@@ -198,4 +198,24 @@ public class Player {
     }
     return null;
   }
+
+  /**
+   * Окрашивает все элементы в матрице в белый цвет
+   */
+  public void getResetColorMatrix() {
+    for (int row = 0; row < gameField.getRowsNameList().length; row++) {
+      for (int col = 0; col < gameField.getColumnsNameList().size(); col++) {
+        if (gameField.getGameFieldMatrix()[row][col] != null) {
+          if (gameField.getGameFieldMatrix()[row][col].toString().equals(MISSED)) {
+            gameField.getGameFieldMatrix()[row][col] = GameElements.MISSED.getNameElement();
+          } else if (gameField.getGameFieldMatrix()[row][col].toString().equals(HURT)) {
+            gameField.getGameFieldMatrix()[row][col] = GameElements.HURT.getNameElement();
+          } else if (gameField.getGameFieldMatrix()[row][col].toString().equals(KILLED)) {
+            gameField.getGameFieldMatrix()[row][col] = GameElements.KILLED.getNameElement();
+          }
+        }
+      }
+    }
+  }
+
 }

@@ -4,8 +4,8 @@ public enum Direction {
   NONE("None", 0, 0, -1),
   LEFT("Left", 0, -1, 0),
   RIGHT("Right", 0, 1, 1),
-  TOP("Left", -1, 0, 2),
-  BOTTOM("Left", 1, 0, 3);
+  TOP("Top", -1, 0, 2),
+  BOTTOM("Bottom", 1, 0, 3);
 
   private final String direction;
   private final int row;

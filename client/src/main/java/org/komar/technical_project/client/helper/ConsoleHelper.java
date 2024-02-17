@@ -22,7 +22,7 @@ public class ConsoleHelper {
                            + " -[координата начала расположения (столбец)] "
                            + "-[v(вертикальное расположение)/h(горизонтальное расположение)]");
     System.out.println(
-        "например: " + TextColor.ANSI_GREEN.getColorText() + "\nship - p - 5 - 3 - g - v"
+        "например: " + TextColor.ANSI_GREEN.getColorText() + "\nship -p -5 -3 -g -v"
             + TextColor.ANSI_RESET.getColorText());
     System.out.println("Для автогенерации игрового поля нужно ввести команду:\n" + TextColor.ANSI_GREEN.getColorText()
                            + "ship -r" + TextColor.ANSI_RESET.getColorText());

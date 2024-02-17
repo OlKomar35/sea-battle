@@ -8,6 +8,7 @@ public class SetOfShips {
   //region Поля класса SetOfShip
   protected Map<Ship, Integer> completeSetOfShips;
   protected int totalCount = 0;
+  protected int maxShipElements = 0;
   //endregion
 
   /**
@@ -24,8 +25,8 @@ public class SetOfShips {
 
     for (Map.Entry<Ship, Integer> entry : completeSetOfShips.entrySet()) {
       totalCount += entry.getValue();
+      maxShipElements +=(entry.getKey().getLengthShip()*entry.getValue());
     }
-
   }
 
   public Map<Ship, Integer> getCompleteSetOfShips() {
@@ -58,5 +59,13 @@ public class SetOfShips {
     for (Map.Entry<Ship, Integer> entry : completeSetOfShips.entrySet()) {
       System.out.println(entry.getKey().getViewShip() + " - " + entry.getValue() + " штук");
     }
+  }
+
+  /**
+   * Выдает общее количество элементов всех кораблей на поле
+   * @return общее кол-во элементов
+   */
+  public int getMaxShipElements() {
+    return maxShipElements;
   }
 }

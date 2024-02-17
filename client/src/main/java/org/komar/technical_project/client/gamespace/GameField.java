@@ -152,23 +152,6 @@ public class GameField {
   }
 
   /**
-   * Окрашивает все элементы в матрице в белый цвет
-   */
-  public void getResetColorMatrix() {
-    for (int row = 0; row < rowsNameList.length; row++) {
-      for (int col = 0; col < columnsNameList.size(); col++) {
-        if (gameFieldMatrix[row][col].toString().contains(GameElements.MISSED.getNameElement())) {
-          gameFieldMatrix[row][col] = GameElements.MISSED.getNameElement();
-        } else if (gameFieldMatrix[row][col].toString().contains(GameElements.HURT.getNameElement())) {
-          gameFieldMatrix[row][col] = GameElements.HURT.getNameElement();
-        } else if (gameFieldMatrix[row][col].toString().contains(GameElements.KILLED.getNameElement())) {
-          gameFieldMatrix[row][col] = GameElements.KILLED.getNameElement();
-        }
-      }
-    }
-  }
-
-  /**
    * Записывает матрицу игрока в файл
    *
    * @param writer буфер для записи файла

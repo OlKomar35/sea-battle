@@ -93,8 +93,8 @@ public class Gameplay {
       Player opponent = player2;
       int countElements = 0;
       while (!winner) {
-        step.setCountSteps(step.getCountSteps() + 1);
         ConsoleHelper.getMsgCoordinates(step.getName());
+        step.setCountSteps(step.getCountSteps() + 1);
 
         Coordinates coordinates = step.getCoordinates(scanner);
         if (step instanceof Bot) {
@@ -121,12 +121,12 @@ public class Gameplay {
           step = opponent;
           opponent = temp;
         } else if (gameElements.equals(GameElements.HURT)) {
-          step.setCountFineSteps(step.getCountSteps() + 1);
+          step.setCountFineSteps(step.getCountFineSteps() + 1);
         } else if (gameElements.equals(GameElements.KILLED)) {
           writer.write("Был убит корабль состоящий из " + opponent.getCountHurtElements() + " элемента(-ов)");
           writer.newLine();
 
-          step.setCountFineSteps(step.getCountSteps() + 1);
+          step.setCountFineSteps(step.getCountFineSteps() + 1);
 
           opponent.getSetOfShips().removeShips(Ship.getViewShipByLength(opponent.getCountHurtElements()));
           opponent.setTotalCountShip(opponent.getTotalCountShip() - 1);
@@ -152,7 +152,7 @@ public class Gameplay {
 
       writer.write("Выиграл игрок: " + step.getName()
                        + ", осталось неубитыми "
-                       + (step.getSetOfShips().getTotalShipsCount() - step.getTotalCountShip())
+                       + (step.getTotalCountShip())
                        + " собственных кораблей");
       writer.newLine();
       writer.write("Было сделано " + step.getCountSteps() + " ходов");
@@ -161,14 +161,14 @@ public class Gameplay {
                        + (step.getCountFineSteps() * 100) / step.getCountSteps());
       writer.newLine();
       writer.write("Игровое поле первого игрока, на конец игры ");
-      //player1.getGameField().getResetColorMatrix();
-      player1.getGameField().writeToFileGameBoard(writer);
+      step.getResetColorMatrix();
+      step.getGameField().writeToFileGameBoard(writer);
       writer.newLine();
       writer.write("----------------------------------------------------------------------------------------");
       writer.newLine();
       writer.write("Проиграл игрок: " + opponent.getName()
                        + ", осталось неубитыми "
-                       + +(opponent.getSetOfShips().getTotalShipsCount() - opponent.getTotalCountShip())
+                       + (opponent.getTotalCountShip())
                        + " собственных кораблей");
       writer.newLine();
       writer.write("Было сделано " + opponent.getCountSteps() + " ходов");
@@ -177,8 +177,8 @@ public class Gameplay {
                        + (opponent.getCountFineSteps() * 100) / opponent.getCountSteps());
       writer.newLine();
       writer.write("Игровое поле второго игрок, на конец игры ");
-      //player2.getGameField().getResetColorMatrix();
-      player2.getGameField().writeToFileGameBoard(writer);
+      opponent.getResetColorMatrix();
+      opponent.getGameField().writeToFileGameBoard(writer);
       writer.newLine();
       writer.newLine();
 
@@ -256,7 +256,7 @@ public class Gameplay {
       for (int column = 0; column < player2.getGameField().getGameFieldMatrix()[0].length; column++) {
         if (player2.getGameField().getGameFieldMatrix()[row][column] != null
             && !player2.getGameField().getGameFieldMatrix()[row][column].equals(BUSY)
-            && !player2.getGameField().getGameFieldMatrix()[row][column].equals(ELEMENT_SHIP)) {
+            /*&& !player2.getGameField().getGameFieldMatrix()[row][column].equals(ELEMENT_SHIP)*/) {
           System.out.print(player2.getGameField().getGameFieldMatrix()[row][column] + " ");
         } else {
           System.out.print("~ ");
@@ -268,7 +268,7 @@ public class Gameplay {
     System.out.println();
 
     System.out.print("  Ваши корабли, " + player1.getName() + " ");
-    System.out.println("Корабли противника," + player2.getName() + " ,которые остались");
+    System.out.println("         Корабли, " + player2.getName() + " ,которые остались");
     Iterator<Map.Entry<Ship, Integer>> iterator1 = player1.getSetOfShips().getCompleteSetOfShips().entrySet()
         .iterator();
     Iterator<Map.Entry<Ship, Integer>> iterator2 = player2.getSetOfShips().getCompleteSetOfShips().entrySet()
