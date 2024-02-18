@@ -16,12 +16,7 @@ public class SetOfShips {
    */
   public SetOfShips() {
     completeSetOfShips = new LinkedHashMap<>();
-    completeSetOfShips.put(Ship.SIX, Ship.SIX.getMaxCountShip());
-    completeSetOfShips.put(Ship.FIVE, Ship.FIVE.getMaxCountShip());
-    completeSetOfShips.put(Ship.FOUR, Ship.FOUR.getMaxCountShip());
-    completeSetOfShips.put(Ship.THREE, Ship.THREE.getMaxCountShip());
-    completeSetOfShips.put(Ship.TWO, Ship.TWO.getMaxCountShip());
-    completeSetOfShips.put(Ship.ONE, Ship.ONE.getMaxCountShip());
+    restoreCompleteSet();
 
     for (Map.Entry<Ship, Integer> entry : completeSetOfShips.entrySet()) {
       totalCount += entry.getValue();
@@ -67,5 +62,14 @@ public class SetOfShips {
    */
   public int getMaxShipElements() {
     return maxShipElements;
+  }
+
+  public void restoreCompleteSet(){
+    completeSetOfShips.put(Ship.SIX, Ship.SIX.getMaxCountShip());
+    completeSetOfShips.put(Ship.FIVE, Ship.FIVE.getMaxCountShip());
+    completeSetOfShips.put(Ship.FOUR, Ship.FOUR.getMaxCountShip());
+    completeSetOfShips.put(Ship.THREE, Ship.THREE.getMaxCountShip());
+    completeSetOfShips.put(Ship.TWO, Ship.TWO.getMaxCountShip());
+    completeSetOfShips.put(Ship.ONE, Ship.ONE.getMaxCountShip());
   }
 }

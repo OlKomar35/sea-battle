@@ -5,4 +5,4 @@
  chcp 65001
 
   %JAVA_EXE% -Xmx1024m -Dfile.encoding=UTF8  -jar server-1.0-SNAPSHOT.jar
-  %JAVA_EXE% -Xmx1024m -Dfile.encoding=UTF8  -jar client-1.0-SNAPSHOT.jar
+  %JAVA_EXE% -Xmx1024m -Dfile.encoding=UTF8  -jar sea-battle.jar

@@ -38,6 +38,7 @@ public class Admin {
   private Object[][] gameFieldMatrixPlayer1;
   private Object[][] gameFieldMatrixPlayer2;
   private int numPlayer;
+  private boolean isBreak = true;
   //endregion
 
   /**
@@ -52,29 +53,16 @@ public class Admin {
     this.numPlayer = 1;
 
     while (!isExit) {
-      this.listFiles = new ArrayList<>();
-      ConsoleHelper.clearConsole();
-      File folder = new File(FileHelper.getRootDirPath());
-      File[] files = folder.listFiles();
-      System.out.println("Архив игр: ");
-      if (files != null) {
-        for (File file : files) {
-          if (file.isFile()) {
-            String dateString = file.getName().split("_")[1].replace(".txt", "");
-            listFiles.add(dateString);
-            LocalDateTime dateTime = LocalDateTime.parse(dateString, DateTimeHelper.getDateTimeFormatFused());
-            String fileName = file.getName().split("_")[0]
-                .concat(" ").concat(dateTime.format(DateTimeHelper.getDateTimeFormat()));
-            System.out.println(listFiles.size() + " " + fileName);
-          }
-        }
-      }
+      viewFilesInFolder(FileHelper.getRootDirPath());
 
       System.out.println("\nЧтобы просмотреть одну из сохраненных игр, введите команду "
                              + TextColor.ANSI_PURPLE.getColorText() + " --file -[номер файла]"
                              + TextColor.ANSI_RESET.getColorText());
       System.out.println("\nЧтобы заархивировать одну из сохраненных игр, введите команду "
                              + TextColor.ANSI_PURPLE.getColorText() + " --archive -[номер файла]"
+                             + TextColor.ANSI_RESET.getColorText());
+      System.out.println("\nЧтобы просмотреть список заархивированных игр, введите команду "
+                             + TextColor.ANSI_PURPLE.getColorText() + " --archive -show"
                              + TextColor.ANSI_RESET.getColorText());
       System.out.println("\nЧтобы удалить одну из сохраненных игр, введите команду "
                              + TextColor.ANSI_PURPLE.getColorText() + " --delete -[номер файла]"
@@ -99,7 +87,7 @@ public class Admin {
           String namePlayer1 = "";
           String namePlayer2 = "";
 
-          while ((lineStr = reader.readLine()) != null) {
+          while ((lineStr = reader.readLine()) != null && isBreak) {
             System.out.printf("%s\n", lineStr);
 
             if (lineStr.startsWith("Игрок 1")) {
@@ -171,26 +159,32 @@ public class Admin {
         }
 
       } else if (massage.startsWith("--archive -")) {
-        int num = Integer.parseInt(massage.split("-")[3]);
-        String nameFile = "game_" + listFiles.get(num - 1) + ".txt";
+        if (!massage.split("-")[3].equals("show")) {
+          int num = Integer.parseInt(massage.split("-")[3]);
+          String nameFile = "game_" + listFiles.get(num - 1) + ".txt";
 
-        Path path = Paths.get(FileHelper.getArchiveDirPath());
+          Path path = Paths.get(FileHelper.getArchiveDirPath());
 
-        if (!Files.exists(path)) {
+          if (!Files.exists(path)) {
+            try {
+              Files.createDirectories(path);
+            } catch (IOException e) {
+              e.printStackTrace();
+            }
+          }
           try {
-            Files.createDirectories(path);
-          } catch (IOException e) {
+            Files.move(Paths.get(FileHelper.getRootDirPath() + FileHelper.fileSeparator + nameFile),
+                       Paths.get(FileHelper.getArchiveDirPath() + FileHelper.fileSeparator + nameFile));
+
+            System.out.println(TextColor.ANSI_PURPLE.getColorText() + "Файл " + nameFile + " успешно заархивирован"
+                                   + TextColor.ANSI_RESET.getColorText());
+          } catch (Exception e) {
             e.printStackTrace();
           }
-        }
-        try {
-          Files.move(Paths.get(FileHelper.getRootDirPath() + FileHelper.fileSeparator + nameFile),
-                     Paths.get(FileHelper.getArchiveDirPath() + FileHelper.fileSeparator + nameFile));
-
-          System.out.println(TextColor.ANSI_PURPLE.getColorText() + "Файл " + nameFile + " успешно заархивирован"
-                                 + TextColor.ANSI_RESET.getColorText());
-        } catch (Exception e) {
-          e.printStackTrace();
+        } else {
+          viewFilesInFolder(FileHelper.getArchiveDirPath());
+          System.out.println("Чтобы вернуться в главное меню напишите команду  --back");
+          scanner.nextLine();
         }
       } else if (massage.startsWith("--delete -")) {
         int num = Integer.parseInt(massage.split("-")[3]);
@@ -232,8 +226,11 @@ public class Admin {
       }
       System.out.println();
     }
-    System.out.println("Нажмите Enter");
-    scanner.nextLine();
+    System.out.println("Нажмите Enter, если хотите выйти из файла в основное меню: --exit");
+    String msg = scanner.nextLine();
+    if (msg.equals("--exit")){
+      isBreak = false;
+    }
     ConsoleHelper.clearConsole();
   }
 
@@ -251,5 +248,24 @@ public class Admin {
       return KILLED;
     }
     return null;
+  }
+
+  private void viewFilesInFolder(String dirName){
+    this.listFiles = new ArrayList<>();
+    ConsoleHelper.clearConsole();
+    File folder = new File(dirName);
+    File[] files = folder.listFiles();
+    if (files != null) {
+      for (File file : files) {
+        if (file.isFile()) {
+          String dateString = file.getName().split("_")[1].replace(".txt", "");
+          listFiles.add(dateString);
+          LocalDateTime dateTime = LocalDateTime.parse(dateString, DateTimeHelper.getDateTimeFormatFused());
+          String fileName = file.getName().split("_")[0]
+              .concat(" ").concat(dateTime.format(DateTimeHelper.getDateTimeFormat()));
+          System.out.println(listFiles.size() + " " + fileName);
+        }
+      }
+    }
   }
 }

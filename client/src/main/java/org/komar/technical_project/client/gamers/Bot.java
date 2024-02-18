@@ -8,6 +8,7 @@ import java.util.Scanner;
 import org.komar.technical_project.client.gamespace.Coordinates;
 import org.komar.technical_project.client.gamespace.Direction;
 import org.komar.technical_project.client.gamespace.Orientation;
+import org.komar.technical_project.client.gamespace.SetOfShips;
 import org.komar.technical_project.client.gamespace.Ship;
 import org.komar.technical_project.client.gamespace.ShipCoordinates;
 import org.komar.technical_project.client.helper.GameElements;
@@ -16,6 +17,7 @@ public class Bot extends Player {
 
   private int hurtShipElements;
   private Object[][] opponentShipsMatrix;
+  private SetOfShips opponentSetOfShips;
   private int row;
   private int column;
   private int countHurt;
@@ -41,25 +43,29 @@ public class Bot extends Player {
     this.listForTwoCoordinates = new ArrayList<>();
     this.orientation = Orientation.NONE;
     this.direction = Direction.NONE;
+    this.opponentSetOfShips = new SetOfShips();
   }
 
   /**
    * Метод для получения координат, для Бота.
    *
-   * @param scanner переменная для чтения данных из консоли
-   * @return
+   * @param scanner переменная для чтения данных из консоли (не используется в данном классе)
+   * @return получаем новую точку для выстрела (ее координаты)
    */
   @Override
   public Coordinates getCoordinates(Scanner scanner) {
     char columnChar = 0;
     boolean isAlready = false;
 
-    if (hurtShipElements <= MAX_SHIP_ELEMENTS / 2 && status.equals(GameElements.MISSED) && (isKilled || countHurt == 0)
-        || status.equals(GameElements.KILLED)) {
+    if (hurtShipElements <=  MAX_SHIP_ELEMENTS / 2 && status.equals(GameElements.MISSED)
+        && (isKilled || countHurt == 0) || status.equals(GameElements.KILLED)) {
 
       if (status.equals(GameElements.KILLED)) {
+        countHurt++;
+        opponentSetOfShips.removeShips(Ship.getViewShipByLength(countHurt));
         opponentShipsMatrix[row - 1][column] = KILLED;
         fillGameFieldOpponent();
+
         listForTwoCoordinates.clear();
         isKilled = true;
         countHurt = 0;
@@ -72,7 +78,7 @@ public class Bot extends Player {
         this.row = gameField.getRowsNameList()[randomRowIndex];
         columnChar = gameField.getColumnsNameList().get(randomColumnIndex);
         this.column = getGameField().getColumnsNameList().indexOf(columnChar);
-        if (opponentShipsMatrix[row - 1][column] == null) { // заполняем матрицу выстрелами, чтобы не повторялись
+        if (opponentShipsMatrix[row - 1][column] == null) {
           isAlready = true;
           opponentShipsMatrix[row - 1][column] = BUSY;
         }
@@ -133,8 +139,53 @@ public class Bot extends Player {
         }
       }
     } else {
-      for (Map.Entry<Ship, Integer> entry : setOfShips.getCompleteSetOfShips().entrySet()) {
-        System.out.println(entry.getKey() + " " + entry.getValue());
+
+      Ship ship = opponentSetOfShips.getCompleteSetOfShips()
+          .entrySet()
+          .stream()
+          .filter(entry -> entry.getValue() != 0)
+          .map(Map.Entry::getKey)
+          .findFirst()
+          .orElse(Ship.ONE);
+
+      int length = ship.getLengthShip();
+
+      int count = 0;
+      int r = 0;
+      int c = 0;
+
+      while (count < length && r < getGameField().getROW_COUNT()) {
+        c = 0;
+        count = 0;
+        while (count < length && c < getGameField().getCOLUMN_COUNT()) {
+          count = (opponentShipsMatrix[r][c] == null) ? count + 1 : 0;
+          c++;
+        }
+        r++;
+      }
+      System.out.println(count);
+      if (count < length) {
+        c = 0;
+        count = 0;
+        r = 0;
+        while (count < length && c < getGameField().getCOLUMN_COUNT()) {
+          r = 0;
+          count = 0;
+          while (count < length && r < getGameField().getROW_COUNT()) {
+            count = (opponentShipsMatrix[r][c] == null) ? count + 1 : 0;
+            r++;
+          }
+          c++;
+        }
+        row = r - length / 2;
+        column = c - 1;
+      } else {
+        row = r;
+        column = c - 1 - length / 2;
+      }
+
+      if (opponentShipsMatrix[row - 1][column] == null) {
+        opponentShipsMatrix[row - 1][column] = BUSY;
       }
     }
 
@@ -143,6 +194,10 @@ public class Bot extends Player {
     return new Coordinates(row, column);
   }
 
+  /**
+   * Метод меняет "голову" корабля с "хвостом" местам. ("Голова" - это первый раненый элемент в корабле, "Хвост" -
+   * последний раненый элемент)
+   */
   private void changedHeadShip() {
     if (countHurt >= 2) {
       Coordinates temp = listForTwoCoordinates.get(0);
@@ -151,6 +206,13 @@ public class Bot extends Player {
     }
   }
 
+  /**
+   * Метод, который меняет направление обстрела
+   *
+   * @param orientation - ориентация (горизонтально или вертикально)
+   * @param direction   - направление (Лево, Право, Верх, Низ)
+   * @return получаем новое направление
+   */
   private Direction changedDirection(Orientation orientation,
                                      Direction direction) {
 
@@ -166,6 +228,15 @@ public class Bot extends Player {
     return Direction.NONE;
   }
 
+  /**
+   * Метод, который генерирует координаты для следующего выстрела, в случае если, корабль не убит, а ранен
+   *
+   * @param row         координата строки, "хвост" раненого корабля, последняя раненая ячейка (строка)
+   * @param col         координата столбца, "хвост" раненого корабля, последняя раненая ячейка (столбец)
+   * @param orientation ориентация корабль на игровом поле
+   * @param direction   направление в котором делаем выстрел
+   * @return получаем новую точку для выстрела (ее координаты)
+   */
   public Coordinates createRandomCoordinate(int row,
                                             int col,
                                             Orientation orientation,
@@ -233,7 +304,10 @@ public class Bot extends Player {
     return new Coordinates(rowRandom, colRandom);
   }
 
-
+  /**
+   * Метод, который заполняет "ауру" убитого корабля. "Аура" - это расстояние в одну клетку вокруг корабля, расстояние,
+   * на котором точно не может находиться другой корабль
+   */
   private void fillGameFieldOpponent() {
     int rows = opponentShipsMatrix.length;
     int cols = opponentShipsMatrix[0].length;
@@ -247,6 +321,7 @@ public class Bot extends Player {
       }
     }
   }
+
 
   public void checkSurroundingElements(Object[][] matrix,
                                        int row,

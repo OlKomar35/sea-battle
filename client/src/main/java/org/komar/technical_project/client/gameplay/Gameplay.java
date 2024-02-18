@@ -99,7 +99,7 @@ public class Gameplay {
         Coordinates coordinates = step.getCoordinates(scanner);
         if (step instanceof Bot) {
           try {
-            Thread.sleep(1500);
+            Thread.sleep(2500);
           } catch (InterruptedException ex) {
             Thread.currentThread().interrupt();
           }

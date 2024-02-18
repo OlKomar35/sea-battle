@@ -67,6 +67,7 @@ public class Human extends Player {
           gameField.randomFillGameField(setOfShips.getCompleteSetOfShips());
           ConsoleHelper.clearConsole();
           totalCountShip = 0;
+          setOfShips.restoreCompleteSet();
           showPlayerGameField();
         }
       } else {
