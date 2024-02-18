@@ -64,6 +64,9 @@ public class SetOfShips {
     return maxShipElements;
   }
 
+  /**
+   * Обновляет набор кораблей до максимального
+   */
   public void restoreCompleteSet(){
     completeSetOfShips.put(Ship.SIX, Ship.SIX.getMaxCountShip());
     completeSetOfShips.put(Ship.FIVE, Ship.FIVE.getMaxCountShip());

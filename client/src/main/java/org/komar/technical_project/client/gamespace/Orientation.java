@@ -1,5 +1,8 @@
 package org.komar.technical_project.client.gamespace;
 
+/**
+ * Класс-перечисление для ориентации для расположения кораблей
+ */
 public enum Orientation {
   NONE("None", " "),
   VERTICAL("v", "вертикально"),
@@ -8,6 +11,11 @@ public enum Orientation {
   private String orientation;
   private String name;
 
+  /**
+   * Класс-перечисление для ориентации для расположения кораблей
+   * @param orientation ориентация (горизонтально, вертикально)
+   * @param name название ориентации для вывода в сообщениях для пользователя
+   */
   Orientation(String orientation,
               String name) {
     this.orientation = orientation;
@@ -22,6 +30,11 @@ public enum Orientation {
     return name;
   }
 
+  /**
+   * Метод для получения названия по его ориентации
+   * @param orientation ориентация
+   * @return сообщение для вывода в консоль
+   */
   public static String getNameByAbbreviation(String orientation) {
     for (Orientation o : Orientation.values()) {
       if (o.orientation.equals(orientation)) {

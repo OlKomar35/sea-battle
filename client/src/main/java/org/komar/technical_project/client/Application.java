@@ -12,12 +12,15 @@ import org.komar.technical_project.client.gamers.Player;
 import org.komar.technical_project.client.helper.ConsoleHelper;
 import org.komar.technical_project.client.helper.TextColor;
 
+/**
+ * Главный класс в котором находится точка входа в игру
+ *
+ * @author Комар Ольга
+ * @version 1.0
+ */
+
 public class Application {
 
-  /**
-   *
-   * @param args
-   */
   public static void main(String[] args) {
 
     ConsoleHelper.clearConsole();
@@ -26,49 +29,65 @@ public class Application {
     System.out.println("*              Морской бой             *");
     System.out.println("* * * * * * * * * * * * * * * * * * *  *" + TextColor.ANSI_RESET.getColorText());
 
-    System.out.println("Для авторизации с правами администратора введите команду"
-                           + TextColor.ANSI_GREEN.getColorText() + " --admin" + TextColor.ANSI_RESET.getColorText()
-                           + ", если хотите начать игру нажмите "
-                           + TextColor.ANSI_GREEN.getColorText() + "Enter" + TextColor.ANSI_RESET.getColorText());
-
     Scanner scanner = new Scanner(System.in, "UTF-8");
 
-    if (!scanner.nextLine().equals("--admin")) {
-      Player player1 = getPlayer(scanner);
-      ConsoleHelper.getMsgChoosingOpponent();
+    while (true) {
+      System.out.println("Для авторизации с правами администратора введите команду"
+                             + TextColor.ANSI_GREEN.getColorText() + " --admin" + TextColor.ANSI_RESET.getColorText()
+                             + ", если хотите начать игру нажмите "
+                             + TextColor.ANSI_GREEN.getColorText() + "Enter" + TextColor.ANSI_RESET.getColorText());
+      System.out.println("Для выхода введите команду "
+                             + TextColor.ANSI_GREEN.getColorText() + "--exit" + TextColor.ANSI_RESET.getColorText());
+      String command = scanner.nextLine();
 
-      Player player2 = null;
-      boolean isSelectedOpponent = false;
+      if (command.equals("--exit")) {
+        System.exit(0);
+      } else if (command.equals("--admin")) {
+        new Admin(scanner);
+      } else {
+        Player player1 = getPlayer(scanner);
+        ConsoleHelper.getMsgChoosingOpponent();
 
-      while (!isSelectedOpponent) {
-        String nameGamer2 = scanner.nextLine();
-        if (nameGamer2.startsWith("gamer2")) {
+        Player player2 = null;
+        boolean isSelectedOpponent = false;
 
-          String[] partMsg = nameGamer2.split(" -");
-          String msg = partMsg[1];
+        while (!isSelectedOpponent) {
+          String nameGamer2 = scanner.nextLine();
+          if (nameGamer2.startsWith("gamer2 ")) {
 
-          if (msg.equals("bot")) {
-            player2 = new Bot();
-          } else if (msg.equals("p")) {
-            player2 = getPlayer(scanner);
-          } else if (msg.equals("np")) {
             try {
-              Network network = new Network(scanner);
-              player2 = new NetworkPlayer();
-            } catch (IOException e) {
-              throw new RuntimeException(e);
+              String[] partMsg = nameGamer2.split(" -");
+              String msg = partMsg[1];
+
+              if (msg.equals("bot")) {
+                isSelectedOpponent = true;
+                player2 = new Bot();
+              } else if (msg.equals("p")) {
+                isSelectedOpponent = true;
+                player2 = getPlayer(scanner);
+              } else if (msg.equals("np")) {
+                isSelectedOpponent = true;
+                try {
+                  Network network = new Network(scanner);
+                  player2 = new NetworkPlayer();
+                } catch (IOException e) {
+                  throw new RuntimeException(e);
+                }
+              } else {
+                ConsoleHelper.getMsgInvalidCommandEntered();
+                isSelectedOpponent = false;
+              }
+            } catch (ArrayIndexOutOfBoundsException e) {
+              ConsoleHelper.getMsgInvalidCommandEntered();
+              isSelectedOpponent = false;
             }
+          } else {
+            ConsoleHelper.getMsgInvalidCommandEntered();
           }
-          isSelectedOpponent = true;
-        } else {
-          ConsoleHelper.getMsgInvalidCommandEntered();
         }
+        new Gameplay(player1, player2, scanner);
       }
-      new Gameplay(player1, player2, scanner);
-    } else {
-      new Admin(scanner);
     }
-    scanner.close();
   }
 
   public static Player getPlayer(Scanner scanner) {

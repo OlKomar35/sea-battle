@@ -5,6 +5,10 @@ import java.util.Locale;
 
 public class DateTimeHelper {
 
+  /**
+   * Класс, который работает с датами
+   */
+
   private static String formatPattern = "dd-MM-yyyy HH:mm:ss";
   private static String formatTimePattern = "HH:mm:ss";
   private static String formatPatternFused = "yyMMddHHmmss";

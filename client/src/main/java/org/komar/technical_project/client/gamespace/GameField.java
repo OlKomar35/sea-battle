@@ -6,14 +6,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import org.komar.technical_project.client.helper.GameElements;
 
 public class GameField {
 
-  /**
-   * Данный класс необходим для отрисовки и заполнения игрового поля
-   */
-
+  //region Поля класса GameField
   private final String ELEMENT_SHIP = GameElements.ONE_ELEMENT.getNameElement();
   private final String BUSY = GameElements.BUSY.getNameElement();
   private final int ROW_COUNT = 16;
@@ -22,9 +18,10 @@ public class GameField {
   private final List<Character> columnsNameList
       = Arrays.asList('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p');
   private Object[][] gameFieldMatrix;
+  //endregion
 
   /**
-   *
+   * Данный класс необходим для отрисовки и заполнения игрового поля
    */
   public GameField() {
     this.gameFieldMatrix = new String[ROW_COUNT][COLUMN_COUNT];
@@ -46,7 +43,6 @@ public class GameField {
   public Object[][] getGameFieldMatrix() {
     return gameFieldMatrix;
   }
-
 
   public int getROW_COUNT() {
     return ROW_COUNT;
@@ -104,7 +100,6 @@ public class GameField {
 
   /**
    * Заполнение поля кораблями
-   *
    * @param lengthShip           длина корабля
    * @param rowCoordinate        координата строки для начала корабля
    * @param columnCoordinateChar координата столбца для начала корабля
@@ -153,7 +148,6 @@ public class GameField {
 
   /**
    * Записывает матрицу игрока в файл
-   *
    * @param writer буфер для записи файла
    * @throws IOException исключение, которое может возникнуть при записи в файл
    */
@@ -183,7 +177,6 @@ public class GameField {
 
   /**
    * Рандомное заполнение поля кораблями
-   *
    * @param completeSetOfShips набор всех кораблей которые необходимо расставить для игры
    */
   public void randomFillGameField(Map<Ship, Integer> completeSetOfShips) {
@@ -209,6 +202,4 @@ public class GameField {
       }
     }
   }
-
-
 }

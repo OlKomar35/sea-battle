@@ -38,8 +38,10 @@ public class ConsoleHelper {
                            + "gamer2 -bot" + TextColor.ANSI_RESET.getColorText());
     System.out.println("для игры с напарником:\n" + TextColor.ANSI_GREEN.getColorText()
                            + "gamer2 -p" + TextColor.ANSI_RESET.getColorText());
-    System.out.println("для игры с напарником по сети:\n" + TextColor.ANSI_GREEN.getColorText()
-                           + "gamer2 -np" + TextColor.ANSI_RESET.getColorText());
+
+    // todo данная функциональность находится в разработке
+//    System.out.println("для игры с напарником по сети:\n" + TextColor.ANSI_GREEN.getColorText()
+//                           + "gamer2 -np" + TextColor.ANSI_RESET.getColorText());
   }
 
   public static void getMsgMissed() {
@@ -97,7 +99,6 @@ public class ConsoleHelper {
                           + TextColor.ANSI_PURPLE.getColorText() + "!"
                           + TextColor.ANSI_BLUE.getColorText() + "!"
                           + TextColor.ANSI_RED.getColorText() + "!"
-
                           + TextColor.ANSI_RESET.getColorText(), name);
   }
 }

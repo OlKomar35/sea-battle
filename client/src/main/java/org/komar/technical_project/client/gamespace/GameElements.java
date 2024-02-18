@@ -1,4 +1,4 @@
-package org.komar.technical_project.client.helper;
+package org.komar.technical_project.client.gamespace;
 
 public enum GameElements {
   MISSED(".", "Мимо"),
@@ -10,6 +10,12 @@ public enum GameElements {
 
   private final String nameElement;
   private final String status;
+
+  /**
+   * Перечисление всех видов элементов для игрового поля
+   * @param nameElement символ элемента
+   * @param status текстовое название для данного элемента
+   */
   GameElements(String nameElement, String status) {
     this.nameElement = nameElement;
     this.status = status;

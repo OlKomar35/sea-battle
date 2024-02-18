@@ -12,70 +12,93 @@ import org.komar.technical_project.client.helper.TextColor;
 public class Human extends Player {
 
   private final Scanner scanner;
+  private boolean flagShip;
+
+
+
+  /**
+   * Класс, который реализовывает логику для человека
+   *
+   * @param name    имя игрока
+   * @param scanner сканер, для чтения данных из консоли
+   */
 
   public Human(String name,
                Scanner scanner) {
     super();
     this.name = name;
     this.scanner = scanner;
+    this.flagShip = false;
 
     System.out.println(name + ", заполните ваши игровые поля кораблями\n");
 
     ConsoleHelper.getMsgFillGameField();
 
-    String coordinatesShipMsg = scanner.nextLine();
     int totalCountShip = setOfShips.getTotalShipsCount();
     while (totalCountShip > 0) {
-      if (totalCountShip < setOfShips.getTotalShipsCount()) {
+      while (!flagShip) {
         System.out.printf("Осталось ввести %d корабль(корабля)\n", totalCountShip);
         System.out.println("Введите команду ship с необходимыми координатами");
+        String coordinatesShipMsg = scanner.nextLine();
 
-        coordinatesShipMsg = scanner.nextLine();
-      }
+        if (coordinatesShipMsg.startsWith("ship ")) {
 
-      if (coordinatesShipMsg.startsWith("ship")) {
+          String[] partMsg = coordinatesShipMsg.split(" -");
+          String msg = partMsg[1];
 
-        String[] partMsg = coordinatesShipMsg.split(" -");
-        String msg = partMsg[1];
+          if (msg.equals("p")) {
 
-        if (msg.equals("p")) {
+            try {
+              int lengthShip = Integer.parseInt(partMsg[2]);
+              Ship selectedShip = Ship.getViewShipByLength(lengthShip);
+              int rowCoordinate = Integer.parseInt(partMsg[3]);
+              char columnCoordinateChar = partMsg[4].charAt(0);
+              String orientation = partMsg[5];
+              String orientationName = Orientation.getNameByAbbreviation(orientation);
 
-          int lengthShip = Integer.parseInt(partMsg[2]);
-          Ship selectedShip = Ship.getViewShipByLength(lengthShip);
-          int rowCoordinate = Integer.parseInt(partMsg[3]);
-          char columnCoordinateChar = partMsg[4].charAt(0);
-          String orientation = partMsg[5];
-          String orientationName = Orientation.getNameByAbbreviation(orientation);
+              if (setOfShips.getCompleteSetOfShips().get(selectedShip) != 0) {
+                if (gameField
+                    .isBusyGameFieldCells(lengthShip, rowCoordinate, columnCoordinateChar, orientation)) {
+                  gameField.fillGameField(lengthShip, rowCoordinate, columnCoordinateChar, orientation);
+                  ConsoleHelper.clearConsole();
 
-          if (setOfShips.getCompleteSetOfShips().get(selectedShip) != 0) {
-            if (gameField
-                .isBusyGameFieldCells(lengthShip, rowCoordinate, columnCoordinateChar, orientation)) {
-              gameField.fillGameField(lengthShip, rowCoordinate, columnCoordinateChar, orientation);
-              ConsoleHelper.clearConsole();
-
-              setOfShips.removeShips(Ship.getViewShipByLength(lengthShip));
-              totalCountShip--;
-            } else {
-              System.out.println("Не возможно разместить корабль длиной "+ lengthShip+ " начиная с ячейки ["
-                                     +rowCoordinate+"-"+columnCoordinateChar+"]" +"-"+ orientationName);
+                  setOfShips.removeShips(Ship.getViewShipByLength(lengthShip));
+                  totalCountShip--;
+                } else {
+                  System.out.println("Не возможно разместить корабль длиной " + lengthShip + " начиная с ячейки ["
+                                         + rowCoordinate + "-" + columnCoordinateChar + "]" + "-" + orientationName);
+                }
+              } else {
+                System.out.println("Корабли с длиной " + lengthShip + " уже расставлены");
+              }
+              showPlayerGameField();
+              flagShip = true;
+            } catch (ArrayIndexOutOfBoundsException | NumberFormatException e ) {
+              ConsoleHelper.getMsgInvalidCommandEntered();
+              flagShip = false;
             }
+          } else if (msg.equals("r")) {
+            gameField.randomFillGameField(setOfShips.getCompleteSetOfShips());
+            ConsoleHelper.clearConsole();
+            totalCountShip = 0;
+            setOfShips.restoreCompleteSet();
+            showPlayerGameField();
+            flagShip = true;
           } else {
-            System.out.println("Корабли с длиной " + lengthShip + " уже расставлены");
+            ConsoleHelper.getMsgInvalidCommandEntered();
+            flagShip = false;
           }
-          showPlayerGameField();
-        } else if (msg.equals("r")) {
-          gameField.randomFillGameField(setOfShips.getCompleteSetOfShips());
-          ConsoleHelper.clearConsole();
-          totalCountShip = 0;
-          setOfShips.restoreCompleteSet();
-          showPlayerGameField();
+
+        } else {
+          ConsoleHelper.getMsgInvalidCommandEntered();
         }
-      } else {
-        ConsoleHelper.getMsgInvalidCommandEntered();
       }
     }
   }
 
+  /**
+   * Отрисовывает игровое поле только данного игрока
+   */
   private void showPlayerGameField() {
     System.out.print("    ");
     for (char c : this.getGameField().getColumnsNameList()) {
@@ -101,11 +124,8 @@ public class Human extends Player {
     System.out.println();
 
     System.out.println("  Ваши корабли, " + this.getName() + " ");
-    Iterator<Entry<Ship, Integer>> iterator1 = this.getSetOfShips().getCompleteSetOfShips().entrySet()
-        .iterator();
 
-    while (iterator1.hasNext()) {
-      Map.Entry<Ship, Integer> entry1 = iterator1.next();
+    for (Entry<Ship, Integer> entry1 : this.getSetOfShips().getCompleteSetOfShips().entrySet()) {
       System.out.print(entry1.getKey().getViewShip() + " - " + entry1.getValue() + " штук");
       System.out.println();
     }

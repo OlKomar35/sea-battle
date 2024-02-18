@@ -5,20 +5,25 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import lombok.NoArgsConstructor;
-import org.komar.technical_project.client.helper.GameElements;
 
 @NoArgsConstructor
 public class ShipCoordinates {
 
-  /**
-   *
-   */
-
+  //region Поля класса ShipCoordinates
   private Map<Coordinates, GameElements> shipCoordinates = new HashMap();
   private List<Coordinates> coordinatesList = new ArrayList<>();
   private Coordinates head;
   private Object[][] playersGameBord;
+  //endregion
 
+  /**
+   * Класс для хранения информации о подбитых кораблях
+   * @param row номер строки "головы" раненого корабля
+   * @param column номер столбца "головы" раненого корабля
+   * @param playersGameBord игровое поле игрока
+   * ("Голова" - это первый раненый элемент в корабле,
+   *   "Хвост" - последний раненый элемент)
+   */
   public ShipCoordinates(int row,
                          int column,
                          Object[][] playersGameBord) {

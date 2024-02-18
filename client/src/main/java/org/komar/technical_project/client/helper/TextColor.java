@@ -12,6 +12,10 @@ public enum TextColor {
 
   private final String colorText;
 
+  /**
+   * Перечисление цветов, для вывода разноцветного текста в консоль
+   * @param colorText код цвета
+   */
   TextColor(String colorText) {
     this.colorText = colorText;
   }

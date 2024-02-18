@@ -1,5 +1,8 @@
 package org.komar.technical_project.client.gamespace;
 
+/**
+ * Класс-перечисление для хранения всех возможных направлений для обстрела
+ */
 public enum Direction {
   NONE("None", 0, 0, -1),
   LEFT("Left", 0, -1, 0),
@@ -12,6 +15,13 @@ public enum Direction {
   private final int column;
   private final int randomNum;
 
+  /**
+   * Класс-перечисление для хранения всех возможных направлений для обстрела
+   * @param direction направление(лево, право, верх, низ)
+   * @param row значение сдвига по строке
+   * @param column значение сдвига по столбцу
+   * @param randomNum числовое значение для направления
+   */
   Direction(String direction,
             int row,
             int column,
@@ -20,10 +30,6 @@ public enum Direction {
     this.row = row;
     this.column = column;
     this.randomNum = randomNum;
-  }
-
-  public String getDirection() {
-    return direction;
   }
 
   public int getRow() {

@@ -21,11 +21,14 @@ import org.komar.technical_project.client.gamespace.Ship;
 import org.komar.technical_project.client.helper.ConsoleHelper;
 import org.komar.technical_project.client.helper.DateTimeHelper;
 import org.komar.technical_project.client.helper.FileHelper;
-import org.komar.technical_project.client.helper.GameElements;
+import org.komar.technical_project.client.gamespace.GameElements;
 import org.komar.technical_project.client.helper.TextColor;
 
-public class Gameplay {
+/**
+ * Игровое поле
+ */
 
+public class Gameplay {
   private final Player player1;
   private Player player2;
   private Scanner scanner;
@@ -38,6 +41,12 @@ public class Gameplay {
   private final String BUSY = GameElements.BUSY.getNameElement();
   private boolean winner;
 
+  /**
+   * Игровое поле
+   * @param player1 Первый игрок
+   * @param player2 Второй игрок
+   * @param scanner сканер, для получения сообщений из консоли от пользователя
+   */
   public Gameplay(Player player1,
                   Player player2,
                   Scanner scanner) {
@@ -188,6 +197,12 @@ public class Gameplay {
     }
   }
 
+  /**
+   * Метод, который заполняет "ауру" убитого корабля.
+   * "Аура" - это расстояние в одну клетку вокруг корабля, расстояние,
+   * на котором точно не может находиться другой корабль
+   * @param player игрок чье поле нужно заполнить
+   */
   private void fillGameFieldOpponent(Player player) {
     int rows = player.getGameField().getGameFieldMatrix().length;
     int cols = player.getGameField().getGameFieldMatrix()[0].length;
@@ -202,7 +217,7 @@ public class Gameplay {
     }
   }
 
-  public void checkSurroundingElements(Object[][] matrix,
+  private void checkSurroundingElements(Object[][] matrix,
                                        int row,
                                        int col) {
     int rows = matrix.length;
@@ -221,7 +236,13 @@ public class Gameplay {
     }
   }
 
-
+  /**
+   * Метод, который отрисовывает общее игровое поле для двух игроков (для игрока чей сейчас ход оно отрисовывает
+   * свое поле заполненное кораблями, а поле противника, только с отметками ходов (мимо, ранил, убил и аурой кораблей
+   * противника))
+   * @param player1 игрок, чей сейчас ход
+   * @param player2 противник
+   */
   public void showGeneralGameField(Player player1,
                                    Player player2) {
     System.out.print("    ");
@@ -256,7 +277,7 @@ public class Gameplay {
       for (int column = 0; column < player2.getGameField().getGameFieldMatrix()[0].length; column++) {
         if (player2.getGameField().getGameFieldMatrix()[row][column] != null
             && !player2.getGameField().getGameFieldMatrix()[row][column].equals(BUSY)
-            /*&& !player2.getGameField().getGameFieldMatrix()[row][column].equals(ELEMENT_SHIP)*/) {
+            && !player2.getGameField().getGameFieldMatrix()[row][column].equals(ELEMENT_SHIP)) {
           System.out.print(player2.getGameField().getGameFieldMatrix()[row][column] + " ");
         } else {
           System.out.print("~ ");
@@ -268,7 +289,7 @@ public class Gameplay {
     System.out.println();
 
     System.out.print("  Ваши корабли, " + player1.getName() + " ");
-    System.out.println("         Корабли, " + player2.getName() + " ,которые остались");
+    System.out.println("                  Корабли, " + player2.getName() + " ,которые остались");
     Iterator<Map.Entry<Ship, Integer>> iterator1 = player1.getSetOfShips().getCompleteSetOfShips().entrySet()
         .iterator();
     Iterator<Map.Entry<Ship, Integer>> iterator2 = player2.getSetOfShips().getCompleteSetOfShips().entrySet()

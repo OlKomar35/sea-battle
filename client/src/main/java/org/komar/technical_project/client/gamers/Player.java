@@ -7,7 +7,7 @@ import org.komar.technical_project.client.gamespace.GameField;
 import org.komar.technical_project.client.gamespace.SetOfShips;
 import org.komar.technical_project.client.gamespace.ShipCoordinates;
 import org.komar.technical_project.client.helper.ConsoleHelper;
-import org.komar.technical_project.client.helper.GameElements;
+import org.komar.technical_project.client.gamespace.GameElements;
 import org.komar.technical_project.client.helper.TextColor;
 
 public class Player {
@@ -35,6 +35,9 @@ public class Player {
   protected int countFineSteps;
   //endregion
 
+  /**
+   * Общая логика для любого типа игроков (ИИ или человек)
+   */
   public Player() {
 
     this.name = "Без имени игрок";
@@ -135,24 +138,27 @@ public class Player {
     int column = 0;
     boolean flag = true;
     while (flag) {
-      String coordinates = scanner.nextLine();
-      String[] partMsg = coordinates.split("-");
-      row = Integer.parseInt(partMsg[0]);
-      if (row > 0 && row <= 16) {
-        flag = false;
-      }
-      char columnChar = partMsg[1].charAt(0);
-      column = getGameField().getColumnsNameList().indexOf(columnChar);
-      if (column != -1) {
-        flag = false;
-      }
-      if (flag) {
+      try {
+        String coordinates = scanner.nextLine();
+        String[] partMsg = coordinates.split("-");
+        row = Integer.parseInt(partMsg[0]);
+        if (row > 0 && row <= 16) {
+          flag = false;
+        }
+        char columnChar = partMsg[1].charAt(0);
+        column = getGameField().getColumnsNameList().indexOf(columnChar);
+        if (column != -1) {
+          flag = false;
+        }
+        if (flag) {
+          System.out.println("Введены не верные координаты, введите заново");
+        }
+      } catch (NumberFormatException | ArrayIndexOutOfBoundsException e) {
         System.out.println("Введены не верные координаты, введите заново");
+        flag = true;
       }
     }
-
     return new Coordinates(row, column);
-
   }
 
   /**
@@ -162,7 +168,6 @@ public class Player {
    * @return Возвращает один из элементов из перечисления GameElements, проставляет в матрице с кораблями значение из
    * GameElements
    */
-
   public GameElements checkingForHits(int row,
                                       int column) {
 
