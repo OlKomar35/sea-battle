@@ -16,7 +16,7 @@ import java.util.Scanner;
 import org.komar.technical_project.client.helper.ConsoleHelper;
 import org.komar.technical_project.client.helper.DateTimeHelper;
 import org.komar.technical_project.client.helper.FileHelper;
-import org.komar.technical_project.client.helper.GameElements;
+import org.komar.technical_project.client.gamespace.GameElements;
 import org.komar.technical_project.client.helper.TextColor;
 
 public class Admin {
@@ -53,6 +53,7 @@ public class Admin {
     this.numPlayer = 1;
 
     while (!isExit) {
+      System.out.println("Список сыгранных игр:");
       viewFilesInFolder(FileHelper.getRootDirPath());
 
       System.out.println("\nЧтобы просмотреть одну из сохраненных игр, введите команду "
@@ -182,6 +183,7 @@ public class Admin {
             e.printStackTrace();
           }
         } else {
+          System.out.println("Список заархивированных игр:");
           viewFilesInFolder(FileHelper.getArchiveDirPath());
           System.out.println("Чтобы вернуться в главное меню напишите команду  --back");
           scanner.nextLine();
@@ -235,7 +237,7 @@ public class Admin {
   }
 
   /**
-   *
+   * Метод получения статуса из файла (ранил, мимо, убил)
    * @param s из файла получаем значение статуса
    * @return заменяем текстовое значение статуса, на значение из перечисления GameElements
    */
@@ -250,6 +252,10 @@ public class Admin {
     return null;
   }
 
+  /**
+   * Выводит в консоль список всех файлов из папки
+   * @param dirName папка из которой необходимо вывести список файлов
+   */
   private void viewFilesInFolder(String dirName){
     this.listFiles = new ArrayList<>();
     ConsoleHelper.clearConsole();
