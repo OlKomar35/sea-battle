@@ -53,14 +53,14 @@
 
 - Платформа Windows, run.bat
     ```shell
-    SET JAVA_HOME=C:\PROGRAM FILES\JAVA\jdk-17  
+    SET JAVA_HOME=C:\PROGRAM FILES\JAVA\jdk-19 
     SET JAVA_EXE="%JAVA_HOME%\bin\java.exe"
     chcp 65001
     %JAVA_EXE% -Xmx1024m  -Dfile.encoding=UTF8 -jar client-1.0-SNAPSHOT.jar
     ```
 - Платформа Linux, run.sh
   ```shell
-    SET JAVA_HOME=C:\PROGRAM FILES\JAVA\jdk-17
+    SET JAVA_HOME=C:\PROGRAM FILES\JAVA\jdk-19
     SET JAVA_EXE="%JAVA_HOME%\bin\java.exe" 
     chcp 65001
     %JAVA_EXE% -Xmx1024m -Dfile.encoding=UTF8 -jar client-1.0-SNAPSHOT.jar
